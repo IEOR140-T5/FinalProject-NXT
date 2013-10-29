@@ -5,9 +5,9 @@ import lejos.nxt.Button;
 
 /**
  * This class can trace a square of any size and in any direction. Uses Differential Pilot
- * @author Khoa Tran, Trevor Davenport
+ * @author Khoa Tran, Trevor Davenport, Phuoc nguyen
  */
-public class SquareBot1 {
+public class Part1 {
 	/**
 	 * Instance variables
 	 */
@@ -20,11 +20,11 @@ public class SquareBot1 {
 	 * The constructor for this class.
 	 * you need to create a Pilot first,  then pass it here
 	 */
-	public SquareBot1(DifferentialPilot aPilot) {
+	public Part1(DifferentialPilot aPilot) {
 		pilot = aPilot;
-		pilot.setTravelSpeed(25);
-		pilot.setAcceleration(50);
-		pilot.setRotateSpeed(150);
+		pilot.setTravelSpeed(30);
+		pilot.setAcceleration(119);
+		pilot.setRotateSpeed(270); 
 	}
 
 	/**
@@ -35,12 +35,15 @@ public class SquareBot1 {
 		System.out.println("GO");
 		Button.waitForAnyPress();
 		DifferentialPilot aPilot = new DifferentialPilot(wheelDiameter, trackWidth, Motor.A, Motor.C);
-		SquareBot1 robot = new SquareBot1(aPilot);
+		Part1 robot = new Part1(aPilot);
 
-		int length = 90;
+		int length = 488;
 		int direction = 1;
 		
+		aPilot.travel(length);
 		
+		
+		/**
 		for (int i = 0; i < 4; i++) {
 			robot.square(length, direction);
 			if (i == 1) { // switch to the other direction after the second iteration
@@ -48,6 +51,7 @@ public class SquareBot1 {
 				direction = -1;
 			}
 		}
+		**/
 	}
 	
 	/**
