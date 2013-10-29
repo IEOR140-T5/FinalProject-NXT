@@ -1,4 +1,4 @@
-package DifferentialPilot;
+package milestone1;
 
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
@@ -7,11 +7,11 @@ import lejos.nxt.Button;
 
 /**
  * This class can trace a square of any size and in any direction. Uses Differential Pilot
- * @author Khoa Tran, Trevor Davenport, Phuoc nguyen
+ * @author Khoa Tran, Phuoc Nguyen
  */
-public class Part1 {
+public class Tracer {
 	/**
-	 * Instance variables
+	 * Instance and static variables for the Tracer object
 	 */
 	DifferentialPilot pilot;
 	private static int squareAngle = 90;
@@ -20,10 +20,10 @@ public class Part1 {
 	private static float tuningParameter = 1.21f;
 	
 	/**
-	 * The constructor for this class.
-	 * you need to create a Pilot first,  then pass it here
+	 * Constructor for a geometry tracer robot
+	 * @param aPilot - DifferentialPilot object
 	 */
-	public Part1(DifferentialPilot aPilot) {
+	public Tracer(DifferentialPilot aPilot) {
 		pilot = aPilot;
 		pilot.setTravelSpeed(30);
 		pilot.setAcceleration(119);
@@ -32,18 +32,22 @@ public class Part1 {
 
 	/**
 	 * Constructs the robot and drives it to meet the project specifications
-	 * @param args the command line arguments
+	 * @param args - command line arguments
 	 */
 	public static void main(String[] args) {
-		DifferentialPilot aPilot = new DifferentialPilot(wheelDiameter, trackWidth, Motor.A, Motor.C);
-		Part1 robot = new Part1(aPilot);
+		// Create a DifferentialPilot and a Tracer objects
+		DifferentialPilot aPilot = new DifferentialPilot(wheelDiameter, 
+				trackWidth, Motor.A, Motor.C);
+		Tracer robot = new Tracer(aPilot);
 		int lengthTrack = 488;
 		int lengthSquare = 120;
 		
+		// Part I - trace 16 tiles
 		System.out.println("Part I");
 		Button.waitForAnyPress();
 		aPilot.travel(lengthTrack);
 		
+		// Part II - rotate 4 times
 		System.out.println("Part II");
 		Button.waitForAnyPress();
 		for(int i = 0; i < 4; i++) {
@@ -51,20 +55,21 @@ public class Part1 {
 			Delay.msDelay(100);
 		}
 		
+		// Part III - trace a square of lengthSquare
 		System.out.println("Part III");
 		Button.waitForAnyPress();
 		robot.square(lengthSquare);
 	}
 	
 	/**
-	 * Top level task:  trace a square of specified size, and direction
-	 * @param length
-	 * @param direction 
+	 * Traces a square of specified length
+	 * @param length - length of one side of the square
 	 */
 	public void square(float length) {
 		for (int i = 0; i < 4; i++) {
 			pilot.travel(length);
 			pilot.rotate(squareAngle  * tuningParameter);
+			Delay.msDelay(100);
 		}
 	}
 }
