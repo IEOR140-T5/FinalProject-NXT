@@ -1,5 +1,6 @@
 package DifferentialPilot;
 import lejos.robotics.navigation.DifferentialPilot;
+import lejos.util.Delay;
 import lejos.nxt.Motor;
 import lejos.nxt.Button;
 
@@ -12,9 +13,10 @@ public class Part1 {
 	 * Instance variables
 	 */
 	DifferentialPilot pilot;
-	private static int SQUAREANGLE = 90;
+	private static int squareAngle = 90;
 	private static float wheelDiameter =  5.38f;
-	private static float trackWidth = 10.8f;
+	private static float trackWidth = 11.2f;
+	private static float tuningParameter = 1.21f;
 	
 	/**
 	 * The constructor for this class.
@@ -32,26 +34,25 @@ public class Part1 {
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) {
-		System.out.println("GO");
-		Button.waitForAnyPress();
 		DifferentialPilot aPilot = new DifferentialPilot(wheelDiameter, trackWidth, Motor.A, Motor.C);
 		Part1 robot = new Part1(aPilot);
-
-		int length = 488;
-		int direction = 1;
+		int lengthTrack = 488;
+		int lengthSquare = 120;
 		
-		aPilot.travel(length);
+		System.out.println("Part I");
+		Button.waitForAnyPress();
+		aPilot.travel(lengthTrack);
 		
-		
-		/**
-		for (int i = 0; i < 4; i++) {
-			robot.square(length, direction);
-			if (i == 1) { // switch to the other direction after the second iteration
-				robot.pilot.rotate(SQUAREANGLE);
-				direction = -1;
-			}
+		System.out.println("Part II");
+		Button.waitForAnyPress();
+		for(int i = 0; i < 4; i++) {
+			aPilot.rotate(squareAngle * tuningParameter);
+			Delay.msDelay(100);
 		}
-		**/
+		
+		System.out.println("Part III");
+		Button.waitForAnyPress();
+		robot.square(lengthSquare);
 	}
 	
 	/**
@@ -59,10 +60,10 @@ public class Part1 {
 	 * @param length
 	 * @param direction 
 	 */
-	public void square(float length, int direction) {
+	public void square(float length) {
 		for (int i = 0; i < 4; i++) {
 			pilot.travel(length);
-			pilot.rotate(SQUAREANGLE  * direction);
+			pilot.rotate(squareAngle  * tuningParameter);
 		}
 	}
 }
