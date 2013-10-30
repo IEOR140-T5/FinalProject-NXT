@@ -20,7 +20,7 @@ public class Tracer {
 	private static float wheelDiameter = 5.38f;
 	private static float trackWidth = 11.2f;
 	private static float rotatingParameter = 1.21f;
-	private static float tuningParameter = 1.15f;
+	private static float tuningParameter = 1.18f;
 
 	/**
 	 * Constructor for a geometry tracer robot
@@ -46,9 +46,10 @@ public class Tracer {
 		DifferentialPilot aPilot = new DifferentialPilot(wheelDiameter,
 				trackWidth, Motor.A, Motor.C);
 		Tracer robot = new Tracer(aPilot);
-		int lengthTrack = 486;
-		int lengthSquare = 119;
+		int lengthTrack = 484;
+		int lengthSquare = 120;
 
+		
 		// Part I - trace 16 tiles
 		System.out.println("Part I");
 		Button.waitForAnyPress();
@@ -73,11 +74,16 @@ public class Tracer {
 			Delay.msDelay(150);
 		}
 
+
 		// Part III - trace a square of lengthSquare
 		System.out.println("Part III");
 		Button.waitForAnyPress();
 		Delay.msDelay(500);
-		robot.square(lengthSquare);
+		robot.square(lengthSquare, 1);
+		
+		robot.pilot.rotate(squareAngle * rotatingParameter);
+		Delay.msDelay(500);
+		robot.square(lengthSquare, -1);
 	}
 
 	/**
@@ -86,10 +92,10 @@ public class Tracer {
 	 * @param length
 	 *            - length of one side of the square
 	 */
-	public void square(float length) {
+	public void square(float length, int direction) {
 		for (int i = 0; i < 4; i++) {
 			pilot.travel(length);
-			pilot.rotate(squareAngle * tuningParameter);
+			pilot.rotate(squareAngle * tuningParameter * direction);
 			Delay.msDelay(500);
 		}
 	}
