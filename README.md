@@ -1,19 +1,24 @@
 FinalProject - Milestone 2
 ============
 
-1.    Introduction
+1.    Introduction -- Prototype of Bomb Disposal Robot. 
 
-1.1. Name of the assignment, due date
+1.1. Name of the assignment: Milestone 2 -- Scanner beacon bearing and wall distance accuracy. Due 10/31.
 
-1.2. Lab team number, names of participating members with a  brief description of what each contributed to the project (for example : program designer,  mechanical designer,  report writer,  program coder)  
+1.2. Team Number 5. Team members include Corey Short (Mechanical), Khoa Tran (Programmer), Peter Nguyen (Programmer),
+     and Trevor Davenport (Report).
 
-1.3. Approximate number of person hours spent on the project.
+1.3. Approximate number of person hours spent on the project: 20+ Hours.
 
 2.    Experimental work  (if any):  Use charts and tables where useful
 
-2.1. Experiment description and purpose
+2.1. Experiment description and purpose: The purpose of this Milestone is to successfully modify and test the Scanner class
+                                         to return an array of Beacon bearings. The purpose of this project is to create a basis
+                                         for our final project which includes being able to detect a bomb.
 
-2.2. listing of data
+2.2. Listing of data: Within our project folder you will find 3 separate Excel Files (Beacon Scanning Chart, Wall Distance Tests, and a
+                      Final Scanning Test). When using the coordinates (30,20) we found that there was a difference of roughly 5.36%.
+                      When using the coordinates (240, 210) the discrepancies were nearly 14.29%.
 
 2.3. Calculations and analysis 
 
