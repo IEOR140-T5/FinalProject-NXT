@@ -45,7 +45,7 @@ public class Tracer {
 		DifferentialPilot aPilot = new DifferentialPilot(leftWheelDiameter,
 				rightWheelDiameter, trackWidth, Motor.A, Motor.C, false);
 		Tracer robot = new Tracer(aPilot);
-		int lengthTrack = 484;
+		int lengthTrack = 488;
 		int lengthSquare = 120;
 
 		
