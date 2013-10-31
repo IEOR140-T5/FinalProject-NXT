@@ -20,7 +20,7 @@ FinalProject - Milestone 2
                       Final Scanning Test). When using the coordinates (30,20) we found that there was a difference of roughly 5.36%.
                       When using the coordinates (240, 210) the discrepancies were nearly 14.29%.
 
-2.3. Calculations and analysis 
+2.3. Calculations and analysis: ![Chart](https://raw.github.com/IEOR140-T5/FinalProject-NXT/master/reports/chart-part1.png)
 
 2.4. How results were used in your code
 
