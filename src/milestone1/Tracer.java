@@ -17,10 +17,9 @@ public class Tracer {
 	 */
 	DifferentialPilot pilot;
 	private static int squareAngle = 90;
-	private static float wheelDiameter = 5.38f;
-	private static float trackWidth = 11.2f;
-	private static float rotatingParameter = 1.21f;
-	private static float tuningParameter = 1.18f;
+	private static float leftWheelDiameter = 5.42f;
+	private static float rightWheelDiameter = 5.44f;
+	private static float trackWidth = 13.72f;
 
 	/**
 	 * Constructor for a geometry tracer robot
@@ -43,8 +42,8 @@ public class Tracer {
 	 */
 	public static void main(String[] args) {
 		// Create a DifferentialPilot and a Tracer objects
-		DifferentialPilot aPilot = new DifferentialPilot(wheelDiameter,
-				trackWidth, Motor.A, Motor.C);
+		DifferentialPilot aPilot = new DifferentialPilot(leftWheelDiameter,
+				rightWheelDiameter, trackWidth, Motor.A, Motor.C, false);
 		Tracer robot = new Tracer(aPilot);
 		int lengthTrack = 484;
 		int lengthSquare = 120;
@@ -61,7 +60,7 @@ public class Tracer {
 		Button.waitForAnyPress();
 		Delay.msDelay(500);
 		for (int i = 0; i < 4; i++) {
-			robot.pilot.rotate(squareAngle * rotatingParameter);
+			robot.pilot.rotate(squareAngle);
 			Delay.msDelay(100);
 		}
 
@@ -70,7 +69,7 @@ public class Tracer {
 		Button.waitForAnyPress();
 		Delay.msDelay(500);
 		for (int i = 0; i < 4; i++) {
-			robot.pilot.rotate(squareAngle * rotatingParameter * -1);
+			robot.pilot.rotate(squareAngle * -1);
 			Delay.msDelay(150);
 		}
 
@@ -81,7 +80,7 @@ public class Tracer {
 		Delay.msDelay(500);
 		robot.square(lengthSquare, 1);
 		
-		robot.pilot.rotate(squareAngle * rotatingParameter);
+		robot.pilot.rotate(squareAngle);
 		Delay.msDelay(500);
 		robot.square(lengthSquare, -1);
 	}
@@ -95,7 +94,7 @@ public class Tracer {
 	public void square(float length, int direction) {
 		for (int i = 0; i < 4; i++) {
 			pilot.travel(length);
-			pilot.rotate(squareAngle * tuningParameter * direction);
+			pilot.rotate(squareAngle * direction);
 			Delay.msDelay(500);
 		}
 	}
