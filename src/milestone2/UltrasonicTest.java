@@ -35,6 +35,7 @@ public class UltrasonicTest {
 
 	/**
 	 * Rotates to a certain angle
+	 * 
 	 * @param angle
 	 */
 	public void rotateTo(int angle) {
@@ -43,6 +44,7 @@ public class UltrasonicTest {
 
 	/**
 	 * Test code for ultrasonic test - prelim 2
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
