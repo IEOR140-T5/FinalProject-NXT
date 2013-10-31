@@ -30,10 +30,10 @@ FinalProject - Milestone 2
                                    1. tan(a1) = 210/240 ===> arctan(a1) = 41 degrees
                                    2. tan(a2) = (241-210)/240 ===> arctan(a2) = 7.3 degrees
 
-2.4. How results were used in your code
+2.4. How results were used in your code: The results were used in our Scanner.java class. Based on our calculations, 
+                                         we used them to determine the Standard Deviation for the angles (a1,a2).
 
-3.    Task analysis and corresponding class responsibilities.
+3.     The most interesting/challenging/difficult parts of the project: The most difficult part of this Milestone was building
+                                                                        the robot and hanlding all of the error checking.
 
-4.     The most interesting/challenging/difficult parts of the project
-
-5.    Links to source code and JavaDocs
+4.    Links to source code and JavaDocs: Steam/Team5/FinalPoject-NXT
