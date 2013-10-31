@@ -10,7 +10,7 @@ FinalProject - Milestone 2
 
 1.3. Approximate number of person hours spent on the project: 20+ Hours.
 
-2.    Experimental work  (if any):  Use charts and tables where useful
+2.    Experimental work  (if any): ![Chart](https://raw.github.com/IEOR140-T5/FinalProject-NXT/master/reports/chart-part1.png)
 
 2.1. Experiment description and purpose: The purpose of this Milestone is to successfully modify and test the Scanner class
                                          to return an array of Beacon bearings. The purpose of this project is to create a basis
@@ -20,7 +20,15 @@ FinalProject - Milestone 2
                       Final Scanning Test). When using the coordinates (30,20) we found that there was a difference of roughly 5.36%.
                       When using the coordinates (240, 210) the discrepancies were nearly 14.29%.
 
-2.3. Calculations and analysis: ![Chart](https://raw.github.com/IEOR140-T5/FinalProject-NXT/master/reports/chart-part1.png)
+2.3. Calculations and analysis:    
+
+                                   (20,30)
+                                   1. tan(a1) = 30/20 ===> arctan(a1) = 56 degrees
+                                   2. tan(a2) = (241-30)/20 ===> arctan(a2) = 84 degrees ===> -84 degrees
+                                   
+                                   (240,210)
+                                   1. tan(a1) = 210/240 ===> arctan(a1) = 41 degrees
+                                   2. tan(a2) = (241-210)/240 ===> arctan(a2) = 7.3 degrees
 
 2.4. How results were used in your code
 
