@@ -2,6 +2,7 @@ package milestone2;
 
 import lejos.nxt.*;
 import lejos.util.Datalogger;
+import lejos.util.Delay;
 /**
  * records the results of a 180 degree scan (angle and light intensity
  * to a dataLogger and plays it back over a USB port
@@ -76,6 +77,46 @@ public class ScanRecorder
          Thread.yield();
       }
    }
+   
+   /**
+    * scan from current head angle to limit angle and write the angle and 
+    * light sensor value to the datalog
+    */
+   public void scanWall()
+   {
+      int distance1 = 0;
+      int distance2 = 0;
+      
+      LCD.clear();
+      motor.rotateTo(90, true);
+      
+      while (motor.isMoving())
+      {
+         
+          distance1 = _ussensor.getDistance();
+          LCD.drawInt(distance1, 0, 1);
+
+         Thread.yield();
+      }
+      
+      
+      Delay.msDelay(500);
+      
+      motor.rotateTo(-90, true);
+      
+      while (motor.isMoving())
+      {
+         
+    	  distance2 =  _ussensor.getDistance();
+          LCD.drawInt(distance2, 0, 2);
+
+         Thread.yield();
+      }
+      
+      motor.rotateTo(0);
+      Button.waitForAnyPress();
+   }
+   
 /**
     * rotate the scanner head to the angle
     * @param angle
@@ -101,16 +142,21 @@ public class ScanRecorder
    {
      System.out.println(" go ");
       ScanRecorder s = new ScanRecorder(Motor.B, new LightSensor(SensorPort.S2), new UltrasonicSensor(SensorPort.S3));
-      Motor.B.setSpeed(100);
+      Motor.B.setSpeed(60);
       Button.waitForAnyPress();
       System.out.println(" pressed ");
       
+      /* scan angle 
       int angle = 100;
       s.rotateTo(-angle);
       s.scanTo(angle);
       s.scanTo(-angle);
       s.rotateTo(0);
       s.dl.transmit();  // use usb
+      */
+      
+      /* scan wall */
+      s.scanWall();
    }
    /******* instance variabled ***************/
    NXTRegulatedMotor motor;
