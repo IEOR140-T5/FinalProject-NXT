@@ -36,11 +36,13 @@ Part 3: We place the robot at 2 difference location (20, 30) and (210, 240). For
 ![Chart](https://raw.github.com/IEOR140-T5/FinalProject-NXT/master/reports/chart-part3.png)
 
 
-2.2. Listing of data: Within our project folder you will find 3 separate Excel Files (Beacon Scanning Chart, Wall Distance Tests, and a Final Scanning Test). When using the coordinates (20,30) we found that there was a difference of degree is 3-4 degrees off. When using the coordinates (240, 210) the discrepancies were nearly 1-4 degrees off.
+2.2. Listing of data: 
+
+Within our project folder you will find 3 separate Excel Files (Beacon Scanning Chart, Wall Distance Tests, and a Final Scanning Test). When using the coordinates (20,30) we found that there was a difference of degree is 3-4 degrees off. When using the coordinates (240, 210) the discrepancies were nearly 1-4 degrees off.
 
 2.3. Calculations and analysis:    
 
-The angle is calculate based on the basic trigonometry from the illustration below:
+Part 1: The angle is calculate based on the basic trigonometry from the illustration below:
 
 ![Chart](https://raw.github.com/IEOR140-T5/FinalProject-NXT/master/reports/trig.png)
 
@@ -53,12 +55,20 @@ The angle is calculate based on the basic trigonometry from the illustration bel
                                    1. tan(a1) = 210/240 ===> arctan(a1) = 41 degrees
                                    2. tan(a2) = (241-210)/240 ===> arctan(a2) = 7.3 degrees
 
+Unfortunately, the values that we got never be accurate. We have tried with different motor speeds range from 10-100. The reason is because at first location (20, 30), we can get the right value for the left beacon bearing because it is right next to the robot (a slightly different value). However, for the right beacon, the light sensor takes more time to get the value due to the distance from the robot to the right beacon. The same reason can be applied to the scan at location (210, 240) too. Because that point is far away from the robot so the reading needs a lagging time in order to travel back to the robot, but at the time that light sensor is at another angle. That explains why the data we got never be accurate.
 
 
-2.4. How results were used in your code: The results were used in our Scanner.java class. Based on our calculations, 
-                                         we used them to determine the Standard Deviation for the angles (a1,a2).
+Part 2: After getting the distance from both side by using UltraSonic detector, we add the value up to get the width of the hall. The values that we got is slightly different from the actually length (1 centimeter off). The reason is because we are not sure where is the exact point that the ultrasonic sends out the signal. Also when it turns to another side, the point that it starts sending signal again maybe a little off from the one that it sent signal previously. That's why we didn't get the accurate values for the distance when adding 2 values up.
 
-3. The most interesting/challenging/difficult parts of the project: The most difficult part of this Milestone 
-                                                                        was building the robot and hanlding all of the error checking.
+Part 3: Part 3 we don't have the accurate values for the bearings. The reason is as same as first part, when we lightsensor sends and receives signal, it's a lag time between the two actions so it may be a slightly off result.
+
+
+2.4. How results were used in your code: 
+
+The results were used in our Scanner.java class. Based on our calculations, we used them to determine the Standard Deviation for the angles (a1,a2) which are the 2 values to the beacons. Also, we can know that the distance reader from the ultrasonic sensor is accurate and we can use it to detect or measure the distance to an object.
+
+3. The most interesting/challenging/difficult parts of the project: 
+
+The most difficult part of this Milestone was building the robot and hanlding all of the error checking. Meant that we had to do a lot of changes and adjustments for the hardward in order for the robot to get the right result. The speed and acceleration of the motor also plays an important role for the accuracy. The faster it is, the more inaccurate we get.
 
 4.    Links to source code and JavaDocs: Steam/Team5/FinalPoject-NXT
