@@ -71,4 +71,6 @@ The results were used in our Scanner.java class. Based on our calculations, we u
 
 The most difficult part of this Milestone was building the robot and hanlding all of the error checking. Meant that we had to do a lot of changes and adjustments for the hardward in order for the robot to get the right result. The speed and acceleration of the motor also plays an important role for the accuracy. The faster it is, the more inaccurate we get.
 
-4.    Links to source code and JavaDocs: Steam/Team5/FinalPoject-NXT
+4.    Links to source code and JavaDocs: 
+
+Steam/Team5/FinalPoject-NXT/Milestone 2/
