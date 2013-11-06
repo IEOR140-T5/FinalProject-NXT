@@ -74,7 +74,7 @@ public class Scanner {
 		
 		motor.rotateTo(startAngle);
 		for (int i = 0; i < 2; i++) {
-			ccw = (endAngles[i] > startAngles[i]);
+			ccw = endAngles[i] > startAngles[i];
 			motor.rotateTo(endAngles[i], true);
 
 			while (motor.isMoving()) {
@@ -124,8 +124,18 @@ public class Scanner {
 	}
 
 	/**
-	 * Gets the distance at the current headinh
-	 * @return
+	 * Returns the echo distance to the wall at a given angle
+	 * @param angle the angle the head should rotate to
+	 * @return the echo distance at that angle
+	 */
+	public int getDistanceToWall(float angle) {
+		motor.rotateTo((int) angle);
+		return ultraSensor.getDistance();
+	}
+
+	/**
+	 * Gets the distance at the current heading
+	 * @return the distance at the current heading
 	 */
 	public int getDistance(){
 		return ultraSensor.getDistance();
