@@ -22,7 +22,7 @@ public class Scanner {
 	private LightSensor lightSensor;
 	private UltrasonicSensor ultraSensor;
 	private int[] bearings;
-	public static final int THRESHOLD = 35;
+	public static final int THRESHOLD = 36;
 	public static final int MAX = 1000;
 
 	/**
@@ -36,8 +36,7 @@ public class Scanner {
 	 */
 	public Scanner(NXTRegulatedMotor theMotor, LightSensor theEye) {
 		motor = theMotor;
-		motor.setSpeed(500);
-		motor.setAcceleration(4000);
+		motor.setSpeed(20);
 		lightSensor = theEye;
 		lightSensor.setFloodlight(false);
 		bearings = new int[2];
@@ -55,13 +54,18 @@ public class Scanner {
 	public Scanner(NXTRegulatedMotor theMotor, LightSensor theEye,
 			UltrasonicSensor ussensor) {
 		motor = theMotor;
-		motor.setSpeed(300);
+		motor.setSpeed(20);
 		lightSensor = theEye;
 		lightSensor.setFloodlight(false);
 		ultraSensor = ussensor;
 		bearings = new int[2];
 	}
 	
+	/**
+	 * 
+	 * @param startAngle
+	 * @param endAngle
+	 */
 	public void scanLights(int startAngle, int endAngle) {
 		int[] counterBearings = {MAX, MAX};
 		int[] clockBearings = {MAX, MAX};
@@ -82,7 +86,6 @@ public class Scanner {
 
 			while (motor.isMoving()) {
 				int newAngle = motor.getTachoCount();
-
 				int lv = lightSensor.getLightValue();
 
 				if ((lv > THRESHOLD) && (lv > highestLightValue)) {
@@ -113,7 +116,7 @@ public class Scanner {
 			}
 			highestLightValue = 0;
 		}
-		//calculateBearings(counterBearings, clockBearings);
+		calculateBearings(counterBearings, clockBearings);
 	}
 
 	/**

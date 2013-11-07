@@ -44,13 +44,14 @@ public class Milestone3 {
 		// Try out each of the 4 headings: 0, 90, 180, -90
 		for (int i = 0; i < 4; i++) {
 			p.setHeading((float) 90 * i);
-			for (int j = 0; j < 1; j++) { // repeat 8 times for each heading
+			for (int j = 0; j < 3; j++) { // repeat 8 times for each heading
 				locator.setPose(p);
 				locator.locate();
 				dl.writeLog(locator._pose.getX(), locator._pose.getY(), locator._pose.getHeading());
-				Delay.msDelay(200);
+				Delay.msDelay(100);
 			}
 			pilot.rotate(90);
+			Delay.msDelay(500);
 		}
 		
 		LCD.clearDisplay();

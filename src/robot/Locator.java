@@ -11,8 +11,8 @@ public class Locator {
 	/**
 	 * Fields and static variables
 	 */
-	static final float hallWidth = 239f; // cm - check with scanner
-	static final float beaconY = 229f;   // hallWidth -10
+	static final float hallWidth = 241f; // cm - check with scanner
+	static final float beaconY = 241f;
 	static final float distanceToAxleLength = 5.5f;
 
 	Point[] beacon = { new Point(0, 0), new Point(0, beaconY) };
@@ -45,7 +45,7 @@ public class Locator {
 	float[] scanBeacons() {
 		float x = _pose.getX();
 		float y = _pose.getY();
-		float angleToZeroWall = normalize(_pose.relativeBearing(new Point(x, 0)));
+		float angleToZeroWall = normalize(_pose.relativeBearing(new Point(x, 0))) + 15;
 		float angleToYWall = normalize(_pose.relativeBearing(new Point(x, hallWidth)));
 
 		if (x >= 0) {
@@ -119,52 +119,30 @@ public class Locator {
 	 * @return a new Pose
 	 */
 	Pose fixPosition(float[] bearings, float echoDistance) {
-		Point current = new Point(0,echoDistance);
-		float difference = Math.abs(normalize(bearings[0] - bearings[1]));
-		
-		try {
-			// calculate x using the quadratic formula
-		    double a = 1;
-			double b = - hallWidth / Math.tan(Math.toRadians(difference));
-			double c = - echoDistance * (hallWidth - echoDistance);
-			
-			// quadratic formula
-			double xFloat = (float) (-b + Math.sqrt(Math.pow(b,2) - 4*a*c)) / (2*a);
-			current.x = (float) xFloat;
-			
-		} catch (Exception e) {
-			if(difference == 0) {
-				System.out.println("Error: Bearings are same.");
-			} else {
-				// calculate x using the quadratic formula
-			    double a = 1;
-				double b = 0;
-				double c = - echoDistance * (hallWidth - echoDistance);
-				
-				// quadratic formula
-				double xFloat = (-b + Math.sqrt(Math.pow(b,2) - 4*a*c)) / (2*a);
-				current.x = (float) xFloat;
-			}
+		float y = echoDistance;
+
+		float y0 = y;
+		float y1 = beaconY - y;
+
+		double c = Math.toRadians(normalize(bearings[0] - bearings[1]));
+
+		float x = 0;
+
+		if (Math.abs( Math.abs(c) - 180) <= 2) {
+			x = (float) (beaconY * Math.tan((Math.PI / 2) - (c/2)) / 2);
+		} else if (c > 0) {
+			x = (float) (0.5 * ( ((y0 + y1) / Math.tan(c)) +
+					Math.sqrt( Math.pow(((y0 + y1) / Math.tan(c)), 2) + (4*y0*y1)) ));
+		} else if (c <= 0) {
+			x = (float) (0.5 * ( ((y0 + y1) / Math.tan(c)) -
+					Math.sqrt( Math.pow(((y0 + y1) / Math.tan(c)), 2) + (4*y0*y1)) ));
 		}
-		
-		// change the direction of x based on the orientation of the robot
-		// facing -x direction and a bearing is greater than 90 degrees
-		if ((_pose.getHeading() > 90 || _pose.getHeading() <= -90) && (Math.abs(normalize(bearings[0])) > 90  || Math.abs(normalize(bearings[1])) > 90)) {
-			current.x = -current.x;
-		} 
-		// facing the +x direction and bearings are within 90 degrees
-		else if ((_pose.getHeading() <= 90 && _pose.getHeading() > -90) && (Math.abs(normalize(bearings[0])) <= 90  || Math.abs(normalize(bearings[1])) <= 90) ) {
-			current.x = -current.x;
-		}
-		
-		// set the location of the robot
-		_pose.setLocation(current);
-		
-		// set the heading of the robot
-		_pose.setHeading(_pose.angleTo(beacon[0]) - bearings[0]) ;
-		
+
+		_pose.setLocation(x-3, y);
+		float heading = normalize(_pose.angleTo(beacon[0]) - bearings[0]);
+		_pose.setHeading(heading);
+
 		return _pose;
-		
 	}
 
 
