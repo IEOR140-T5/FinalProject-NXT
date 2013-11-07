@@ -1,5 +1,6 @@
 package robot;
 import lejos.geom.Point;
+import lejos.nxt.LCD;
 import lejos.robotics.navigation.Pose;
 
 /**
@@ -61,7 +62,8 @@ public class Locator {
 			}
 		}
 
-		int[] intBearings = scanner.getBearings();
+		int[] intBearings = new int[2];
+		intBearings = scanner.getBearings();
 		float[] bearings = {0f, 0f};
 		
 		// assign the int bearings to the float bearings
@@ -101,8 +103,9 @@ public class Locator {
 			}
 		}
 
-		System.out.println("Dist to Wall: " + distanceToWall);
-		System.out.println("Bearings: " + bearings);
+		LCD.drawInt(3, 4, 1);
+		//System.out.println("Dist to Wall: " + distanceToWall);
+		//System.out.println("Bearings: (" + bearings[0] + ", " + bearings[1] + ")");
 
 		// Fixes the position based on bearings and the echo distance to wall
 		fixPosition(bearings, (float) distanceToWall);
@@ -136,6 +139,9 @@ public class Locator {
 		_pose.setLocation(x, y);
 		float heading = normalize(_pose.angleTo(beacon[0]) - bearings[0]);
 		_pose.setHeading(heading);
+		System.out.println(_pose.getX());
+		System.out.println(_pose.getY());
+		System.out.println(_pose.getHeading());
 		return _pose;
 	}
 

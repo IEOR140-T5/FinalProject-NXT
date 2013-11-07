@@ -1,5 +1,6 @@
 package robot;
 
+import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Sound;
 import lejos.nxt.UltrasonicSensor;
@@ -39,6 +40,7 @@ public class Scanner {
 		motor.setAcceleration(4000);
 		lightSensor = theEye;
 		lightSensor.setFloodlight(false);
+		bearings = new int[2];
 	}
 
 	/**
@@ -57,6 +59,7 @@ public class Scanner {
 		lightSensor = theEye;
 		lightSensor.setFloodlight(false);
 		ultraSensor = ussensor;
+		bearings = new int[2];
 	}
 	
 	public void scanLights(int startAngle, int endAngle) {
@@ -91,6 +94,7 @@ public class Scanner {
 						clockBearings[cwIndex] = newAngle;
 						cwAssigned = true;
 					}
+					LCD.drawInt(0, 1, 1);
 				} else if ((lv < THRESHOLD) && (ccw && ccwAssigned && ccwIndex == 0)) {
 					ccwIndex++;
 					highestLightValue = 0;
@@ -109,7 +113,7 @@ public class Scanner {
 			}
 			highestLightValue = 0;
 		}
-		calculateBearings(counterBearings, clockBearings);
+		//calculateBearings(counterBearings, clockBearings);
 	}
 
 	/**

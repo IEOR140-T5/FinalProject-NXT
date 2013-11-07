@@ -44,7 +44,7 @@ public class Milestone3 {
 		// Try out each of the 4 headings: 0, 90, 180, -90
 		for (int i = 0; i < 4; i++) {
 			p.setHeading((float) 90 * i);
-			for (int j = 0; j < 8; j++) { // repeat 8 times for each heading
+			for (int j = 0; j < 1; j++) { // repeat 8 times for each heading
 				locator.setPose(p);
 				locator.locate();
 				dl.writeLog(locator._pose.getX(), locator._pose.getY(), locator._pose.getHeading());
@@ -54,7 +54,7 @@ public class Milestone3 {
 		}
 		
 		LCD.clearDisplay();
-		System.out.println("Press button to start transmitting...");
+		System.out.println("Press any button to start transmitting...");
 		Button.waitForAnyPress();
 		dl.transmit();
 	}
