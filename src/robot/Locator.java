@@ -119,28 +119,54 @@ public class Locator {
 	 * @return a new Pose
 	 */
 	Pose fixPosition(float[] bearings, float echoDistance) {
-		float x;
-		float y = beaconY - echoDistance;
-		float tan =  (float)Math.tan(Math.toRadians(normalize(bearings[0]-bearings[1])));
-		float temp = -((float)Math.tan(Math.toRadians(normalize(bearings[0]-bearings[1])))*echoDistance*y);
-		float delta = (float)Math.sqrt(Math.pow(beaconY,2)-(4*tan*temp));
-		float root1 = (float)(beaconY - delta)/(2*tan);
-		float root2 = (float)(beaconY + delta)/(2*tan);
+		Point current = new Point(0,echoDistance);
+		float difference = Math.abs(normalize(bearings[0] - bearings[1]));
 		
-		if (Math.abs(normalize(bearings[0]-bearings[1])) > 90){
-			x = root1;
-		} else {
-			x = root2;
+		try {
+			// calculate x using the quadratic formula
+		    double a = 1;
+			double b = - hallWidth / Math.tan(Math.toRadians(difference));
+			double c = - echoDistance * (hallWidth - echoDistance);
+			
+			// quadratic formula
+			double xFloat = (float) (-b + Math.sqrt(Math.pow(b,2) - 4*a*c)) / (2*a);
+			current.x = (float) xFloat;
+			
+		} catch (Exception e) {
+			if(difference == 0) {
+				System.out.println("Error: Bearings are same.");
+			} else {
+				// calculate x using the quadratic formula
+			    double a = 1;
+				double b = 0;
+				double c = - echoDistance * (hallWidth - echoDistance);
+				
+				// quadratic formula
+				double xFloat = (-b + Math.sqrt(Math.pow(b,2) - 4*a*c)) / (2*a);
+				current.x = (float) xFloat;
+			}
 		}
-
-		_pose.setLocation(x, echoDistance);
-		float heading = normalize(_pose.angleTo(beacon[0]) - bearings[0]);
-		_pose.setHeading(heading);
-		System.out.println(_pose.getX());
-		System.out.println(_pose.getY());
-		System.out.println(_pose.getHeading());
+		
+		// change the direction of x based on the orientation of the robot
+		// facing -x direction and a bearing is greater than 90 degrees
+		if ((_pose.getHeading() > 90 || _pose.getHeading() <= -90) && (Math.abs(normalize(bearings[0])) > 90  || Math.abs(normalize(bearings[1])) > 90)) {
+			current.x = -current.x;
+		} 
+		// facing the +x direction and bearings are within 90 degrees
+		else if ((_pose.getHeading() <= 90 && _pose.getHeading() > -90) && (Math.abs(normalize(bearings[0])) <= 90  || Math.abs(normalize(bearings[1])) <= 90) ) {
+			current.x = -current.x;
+		}
+		
+		// set the location of the robot
+		_pose.setLocation(current);
+		
+		// set the heading of the robot
+		_pose.setHeading(_pose.angleTo(beacon[0]) - bearings[0]) ;
+		
 		return _pose;
+		
 	}
+
 
 	/**
 	 * returns angle between -180 and 180 degrees
