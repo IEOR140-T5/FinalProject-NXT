@@ -119,24 +119,21 @@ public class Locator {
 	 * @return a new Pose
 	 */
 	Pose fixPosition(float[] bearings, float echoDistance) {
-		float y = echoDistance;
-		float y0 = y;
-		float y1 = beaconY - y;
-
-		double c = Math.toRadians(normalize(bearings[0] - bearings[1]));
-		float x = 0;
-
-		if (Math.abs(Math.abs(c) - 180) <= 2) {
-			x = (float) (beaconY * Math.tan((Math.PI / 2) - (c/2)) / 2);
-		} else if (c > 0) {
-			x = (float) (0.5 * ( ((y0 + y1) / Math.tan(c)) +
-					Math.sqrt(Math.pow(((y0 + y1) / Math.tan(c)), 2) + (4*y0*y1))));
-		} else if (c <= 0) {
-			x = (float) (0.5 * ( ((y0 + y1) / Math.tan(c)) -
-					Math.sqrt(Math.pow(((y0 + y1) / Math.tan(c)), 2) + (4*y0*y1))));
+		float x;
+		float y = beaconY - echoDistance;
+		float tan =  (float)Math.tan(Math.toRadians(normalize(bearings[0]-bearings[1])));
+		float temp = -((float)Math.tan(Math.toRadians(normalize(bearings[0]-bearings[1])))*echoDistance*y);
+		float delta = (float)Math.sqrt(Math.pow(beaconY,2)-(4*tan*temp));
+		float root1 = (float)(beaconY - delta)/(2*tan);
+		float root2 = (float)(beaconY + delta)/(2*tan);
+		
+		if (Math.abs(normalize(bearings[0]-bearings[1])) > 90){
+			x = root1;
+		} else {
+			x = root2;
 		}
 
-		_pose.setLocation(x, y);
+		_pose.setLocation(x, echoDistance);
 		float heading = normalize(_pose.angleTo(beacon[0]) - bearings[0]);
 		_pose.setHeading(heading);
 		System.out.println(_pose.getX());
