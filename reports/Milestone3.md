@@ -42,7 +42,10 @@ FinalProject - Milestone 3
                /        |         \
               /         |          \ 
         LightSensor   Locator     UltraSonic Senor                  
-                       
+
+2.6 Software design:
+     The algorithm scans for beacons based on its current relative bearing position to the other.
+     
 
 3. The most interesting/challenging/difficult parts of the project: 
      The most challenging part was writing the algorithm to convert the 
