@@ -70,18 +70,18 @@ public class Scanner {
 		int[] counterBearings = {MAX, MAX};
 		int[] clockBearings = {MAX, MAX};
 		int highestLightValue = 0;
-		int ccwIndex = 0;
-		int cwIndex = 0;
-		boolean ccw = false;
-		boolean ccwAssigned = false;
-		boolean cwAssigned = false;
+		int counterIndex = 0;
+		int clockIndex = 0;
+		boolean counterClockwise = false;
+		boolean counterSet = false;
+		boolean clockSet = false;
 
 		int[] startAngles = {startAngle, endAngle};
 		int[] endAngles = {endAngle, startAngle};
 		
 		motor.rotateTo(startAngle);
 		for (int i = 0; i < 2; i++) {
-			ccw = endAngles[i] > startAngles[i];
+			counterClockwise = endAngles[i] > startAngles[i];
 			motor.rotateTo(endAngles[i], true);
 
 			while (motor.isMoving()) {
@@ -90,28 +90,22 @@ public class Scanner {
 
 				if ((lv > THRESHOLD) && (lv > highestLightValue)) {
 					highestLightValue = lv;
-					if (ccw) {
-						counterBearings[ccwIndex] = newAngle;
-						ccwAssigned = true;
-					} else if (!ccw) {
-						clockBearings[cwIndex] = newAngle;
-						cwAssigned = true;
+					if (counterClockwise) {
+						counterBearings[counterIndex] = newAngle;
+						counterSet = true;
+					} else if (!counterClockwise) {
+						clockBearings[clockIndex] = newAngle;
+						clockSet = true;
 					}
 					LCD.drawInt(0, 1, 1);
-				} else if ((lv < THRESHOLD) && (ccw && ccwAssigned && ccwIndex == 0)) {
-					ccwIndex++;
+				} else if ((lv < THRESHOLD) && (counterClockwise && counterSet && counterIndex == 0)) {
+					counterIndex++;
 					highestLightValue = 0;
-					Sound.playNote(Sound.PIANO, 200, 5);
-					Sound.playNote(Sound.PIANO, 300, 5);
-					Sound.playNote(Sound.PIANO, 400, 5);
-					Sound.playNote(Sound.PIANO, 700, 5);
-				} else if ((lv < THRESHOLD) && (!ccw && cwAssigned && cwIndex == 0)) {
-					cwIndex++;
+					playSound(true);
+				} else if ((lv < THRESHOLD) && (!counterClockwise && clockSet && clockIndex == 0)) {
+					clockIndex++;
 					highestLightValue = 0;
-					Sound.playNote(Sound.PIANO, 700, 5);
-					Sound.playNote(Sound.PIANO, 400, 5);
-					Sound.playNote(Sound.PIANO, 300, 5);
-					Sound.playNote(Sound.PIANO, 200, 5);
+					playSound(false);
 				}
 			}
 			highestLightValue = 0;
@@ -119,6 +113,21 @@ public class Scanner {
 		calculateBearings(counterBearings, clockBearings);
 	}
 
+	/**
+	 * Plays some sound according to the turn angle
+	 */
+	private void playSound(boolean increase) {
+		if (increase) {
+			for (int i = 0; i < 4; i++) {
+				Sound.playNote(Sound.PIANO, 150*i, 5);
+			}
+		} else {
+			for (int i = 4; i > 0; i--) {
+				Sound.playNote(Sound.PIANO, 150*i, 5);
+			}
+		}
+	}
+	
 	/**
 	 * Calculates final bearings based on the bearings clockwise and counterclockwise
 	 * @param counterBearings - counterclockwise bearings
@@ -169,7 +178,6 @@ public class Scanner {
 	}
 	
 	/**
-	 * 
 	 * @return the angle that the head is currently looking in.
 	 */
 	public int getHeadAngle() {
@@ -177,7 +185,6 @@ public class Scanner {
 	}
 
 	/**
-	 * 
 	 * @return the relative bearings to the light beacons stored in scanner
 	 */
 	public int[] getBearings() {
