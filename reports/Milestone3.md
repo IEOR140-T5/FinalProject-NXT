@@ -4,7 +4,7 @@ FinalProject - Milestone 3
 1.    Introduction -- Prototype of Bomb Disposal Robot. 
 
 1.1. Name of the assignment:
-     Milestone 3 Localization
+     Milestone 3 Localization -- the goal of this milestone is to demonstrate and verify the accuracy of our Locator. 
 
 1.2. Team Number 5. Team members include Corey Short (Mechanical), Khoa Tran (Programmer), Peter Nguyen (Programmer),
      and Trevor Davenport (Report).
@@ -26,6 +26,23 @@ FinalProject - Milestone 3
 
 2.4. How results were used in your code: 
      The results were used to calculate the correct heading to set for position.
+
+2.5. Classes and Responsibilties:
+     
+          Scanner Class -- The main class all our robot depends on. What we have been building on the entire course.
+          Locator -- Our locating algorithm class. This class uses mathematical calculations to locate and scan for beacons.
+          
+          Class Dependency Diagram:
+          
+          
+                  <  Scanner  >
+                        v
+                 /      |       \
+                /       |        \
+               /        |         \
+              /         |          \ 
+        LightSensor   Locator     UltraSonic Senor                  
+                       
 
 3. The most interesting/challenging/difficult parts of the project: 
      The most challenging part was writing the algorithm to convert the 
