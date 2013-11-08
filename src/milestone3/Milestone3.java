@@ -37,14 +37,14 @@ public class Milestone3 {
 
 		Datalogger dl = new Datalogger();
 		Pose p = new Pose();
-		p.setLocation(-30, 35);
+		p.setLocation(240, 185);
 		
 		Button.waitForAnyPress();
 
 		// Try out each of the 4 headings: 0, 90, 180, -90
 		for (int i = 0; i < 4; i++) {
 			p.setHeading((float) 90 * i);
-			for (int j = 0; j < 3; j++) { // repeat 8 times for each heading
+			for (int j = 0; j < 2; j++) { // repeat 8 times for each heading
 				locator.setPose(p);
 				locator.locate();
 				dl.writeLog(locator._pose.getX(), locator._pose.getY(), locator._pose.getHeading());
