@@ -62,9 +62,9 @@ public class Scanner {
 	}
 	
 	/**
-	 * 
-	 * @param startAngle
-	 * @param endAngle
+	 * Scans lights from startAngle to endAngle
+	 * @param startAngle - where to begin scanning
+	 * @param endAngle - where to end scanning
 	 */
 	public void scanLights(int startAngle, int endAngle) {
 		int[] counterBearings = {MAX, MAX};
@@ -120,9 +120,9 @@ public class Scanner {
 	}
 
 	/**
-	 * 
-	 * @param counterBearings
-	 * @param clockBearings
+	 * Calculates final bearings based on the bearings clockwise and counterclockwise
+	 * @param counterBearings - counterclockwise bearings
+	 * @param clockBearings - clockwise bearings
 	 */
 	private void calculateBearings(int[] counterBearings, int[] clockBearings) {
 		for (int i = 0; i < counterBearings.length; i++) {
