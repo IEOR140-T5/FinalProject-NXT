@@ -51,7 +51,6 @@ public class Milestone3 {
 				Delay.msDelay(100);
 			}
 			pilot.rotate(90);
-			Delay.msDelay(500);
 		}
 		
 		LCD.clearDisplay();

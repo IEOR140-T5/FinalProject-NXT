@@ -104,8 +104,8 @@ public class Locator {
 		}
 
 		LCD.drawInt(3, 4, 1);
-		//System.out.println("Dist to Wall: " + distanceToWall);
-		//System.out.println("Bearings: (" + bearings[0] + ", " + bearings[1] + ")");
+		System.out.println("Dist to Wall: " + distanceToWall);
+		System.out.println("Bearings: (" + bearings[0] + ", " + bearings[1] + ")");
 
 		// Fixes the position based on bearings and the echo distance to wall
 		fixPosition(bearings, (float) distanceToWall);
@@ -120,25 +120,25 @@ public class Locator {
 	 */
 	Pose fixPosition(float[] bearings, float echoDistance) {
 		float y = echoDistance;
-
 		float y0 = y;
 		float y1 = beaconY - y;
 
 		double c = Math.toRadians(normalize(bearings[0] - bearings[1]));
+		double d = normalize(bearings[0] - bearings[1]);
 
 		float x = 0;
 
-		if (Math.abs( Math.abs(c) - 180) <= 2) {
+		if (Math.abs(Math.abs(d) - 180) <= 2) {
 			x = (float) (beaconY * Math.tan((Math.PI / 2) - (c/2)) / 2);
-		} else if (c > 0) {
+		} else if (d > 0) {
 			x = (float) (0.5 * ( ((y0 + y1) / Math.tan(c)) +
 					Math.sqrt( Math.pow(((y0 + y1) / Math.tan(c)), 2) + (4*y0*y1)) ));
-		} else if (c <= 0) {
+		} else if (d <= 0) {
 			x = (float) (0.5 * ( ((y0 + y1) / Math.tan(c)) -
 					Math.sqrt( Math.pow(((y0 + y1) / Math.tan(c)), 2) + (4*y0*y1)) ));
 		}
 
-		_pose.setLocation(x-3, y);
+		_pose.setLocation(x, y);
 		float heading = normalize(_pose.angleTo(beacon[0]) - bearings[0]);
 		_pose.setHeading(heading);
 
