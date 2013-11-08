@@ -34,7 +34,7 @@ FinalProject - Milestone 3
           Class Dependency Diagram:
           
           
-![Chart](https://raw.github.com/IEOR140-T5/FinalProject-NXT/master/reports/class_diagram.png)      
+![Chart](https://raw.github.com/IEOR140-T5/FinalProject-NXT/master/reports/MS3_class_diagram.png)      
 
 2.6 Software design:
      The algorithm scans for beacons based on its current relative bearing position to the other.
