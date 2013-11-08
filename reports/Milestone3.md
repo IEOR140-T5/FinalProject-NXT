@@ -6,8 +6,7 @@ FinalProject - Milestone 3
 1.1. Name of the assignment:
      Milestone 3 Localization -- the goal of this milestone is to demonstrate and verify the accuracy of our Locator. 
 
-1.2. Team Number 5. Team members include Corey Short (Mechanical), Khoa Tran (Programmer), Peter Nguyen (Programmer),
-     and Trevor Davenport (Report).
+1.2. Team Number 5. Team members include Corey Short (Mechanical), Khoa Tran (Programmer), Peter Nguyen (Programmer), and Trevor Davenport (Report).
 
 1.3. Approximate number of person hours spent on the project: 20+ Hours.
 
@@ -35,13 +34,7 @@ FinalProject - Milestone 3
           Class Dependency Diagram:
           
           
-                  <  Scanner  >
-                        v
-                 /      |       \
-                /       |        \
-               /        |         \
-              /         |          \ 
-        LightSensor   Locator     UltraSonic Senor                  
+![Chart](https://raw.github.com/IEOR140-T5/FinalProject-NXT/master/reports/class_diagram.png)      
 
 2.6 Software design:
      The algorithm scans for beacons based on its current relative bearing position to the other.
