@@ -22,6 +22,7 @@ public class Scanner {
 	private NXTRegulatedMotor motor;
 	private LightSensor lightSensor;
 	private UltrasonicSensor ultraSensor;
+
 	private float[] bearings = new float[2];
 	public static final int THRESHOLD = 30;
 	public static final int MAX = 1000;
