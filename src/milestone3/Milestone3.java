@@ -32,7 +32,6 @@ public class Milestone3 {
 		pilot.setTravelSpeed(30);
 		pilot.setRotateSpeed(360);
 
-		// create a datalogger for transmitting data and set the initial location
 		Datalogger dl = new Datalogger();
 		Pose p = new Pose();
 		p.setLocation(-30, 35);
@@ -40,20 +39,22 @@ public class Milestone3 {
 		
 		Button.waitForAnyPress();
 
-		// Try out each of the 4 headings: 0, 90, 180, -90
+		
 		for (int i = 0; i < 4; i++) {
 			p.setHeading((float) 90 * i);
-			for (int j = 0; j < 2; j++) { // repeat 8 times for each heading
+			for (int j = 0; j < 8; j++) { 
 				locator.setPose(p);
-				float[] bearings = locator.locate(); // bearings is only used for report
+				locator.locateThePose(); // bearings is only used for report
 				dl.writeLog(locator._pose.getX(), locator._pose.getY(), locator._pose.getHeading());
-				Delay.msDelay(100);
+				dl.writeLog(locator._beaconBearing[0], locator._beaconBearing[1]);
+				Delay.msDelay(700);
 			}
 			pilot.rotate(90);
 		}
 		
-		LCD.clearDisplay();
-		System.out.println("Press any button to start transmitting...");
+		//stop to check values
+		Button.waitForAnyPress();
+		System.out.println("Press to continue");
 		Button.waitForAnyPress();
 		dl.transmit();
 	}
