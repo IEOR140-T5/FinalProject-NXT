@@ -22,7 +22,7 @@ public class Scanner {
 	private LightSensor lightSensor;
 	private UltrasonicSensor ultraSensor;
 	private int[] bearings;
-	public static final int THRESHOLD = 30;
+	public static final int THRESHOLD = 35;
 	public static final int MAX = 1000;
 
 	/**
