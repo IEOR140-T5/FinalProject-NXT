@@ -103,9 +103,7 @@ public class Locator {
 		if (isYNearZeroBeacon) {
 			distanceToWall = scanner.getDistanceToWall(angleToNorthWall);
 			beaconsBearings = scanBeacons();
-			if ((int)_pose.getHeading() == 90){
-				
-			}
+			
 		} else {
 			distanceToWall = (int) hallWidth - scanner.getDistanceToWall(angleToSouthWall);
 			beaconsBearings = scanBeacons();
@@ -115,10 +113,10 @@ public class Locator {
 
 		// hard code distanceToWall
 /*		if (_pose.getHeading() == 90){
-			distanceToWall += 5;
+			distanceToWall += 2;
 		}
 		if (_pose.getHeading() == 180){
-			distanceToWall += 5;
+			distanceToWall += 2;
 		} */
 		// for debugging
 		_beaconBearing = beaconsBearings;
@@ -187,6 +185,7 @@ public class Locator {
 			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) + 10);
 		} */
 		
+		// hardcode x
 		_pose.setLocation(x - _differenceXFactor, echoDistance);
 		return _pose;
 	}
@@ -205,13 +204,5 @@ public class Locator {
 		}
 		return angle;
 	}
-	
-	/**
-	 * Prints the pose for debugging
-	 */
-	public void printPose() {
-		System.out.println("X: " + _pose.getX());
-		System.out.println("Y: " + _pose.getY());
-		System.out.println("H: " + _pose.getHeading());
-	}
+
 }
