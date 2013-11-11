@@ -8,7 +8,6 @@ import robot.MessageType;
 import lejos.geom.Point;
 import lejos.nxt.Sound;
 import lejos.nxt.TouchSensor;
-import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
 import lejos.robotics.navigation.Pose;
 import lejos.util.Delay;

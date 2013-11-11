@@ -18,7 +18,6 @@ public class Locator {
 	// 2 Points of the 2 beacons
 	Point[] beacons = { new Point(0, 0), new Point(0, beaconY) };
 	public Pose _pose = new Pose();
-	//public float echoDistance;
 	public float[] _beaconBearing = new float[2];
 	private Scanner scanner;
 	
@@ -52,7 +51,7 @@ public class Locator {
 		
 		// it's when x >=0 in the first Quadrant
 		boolean isFirstQuadrant = (x >=0);
-		// its when Y location is near the zero beacon
+		// it's when Y location is near the zero beacon
 		boolean isYNearZeroBeacon = y < hallWidth/2;
 		
 		if (isFirstQuadrant) {
@@ -74,7 +73,6 @@ public class Locator {
 		}
 		 
 		float[] bearings = scanner.getBearings();
-		
 		return bearings;
 	}
 	
@@ -158,29 +156,10 @@ public class Locator {
 
 		float newHeading = normalize(_pose.angleTo(beacons[0]) - bearings[0]);
 		_pose.setHeading(newHeading);
-
-		// hardcode heading
-		/*
-		if (_pose.getHeading() == 0){
-			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) - 10);
-		}
-		if (_pose.getHeading() == 90){
-			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) - 10);
-		}
-		if (_pose.getHeading() == 180){
-			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) + 10);
-		}
-		if (_pose.getHeading() == 270){
-			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) + 10);
-		} */
-		
-		// hardcode x
 		_pose.setLocation(x - _differenceXFactor, echoDistance);
 		return _pose;
 	}
 	
-
-
 	/**
 	 * Returns angle between -180 and 180 degrees
 	 */
