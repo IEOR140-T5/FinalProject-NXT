@@ -25,7 +25,7 @@ public class ScanTester {
 			for (int i = 0; i < 8; i++) {
 				Button.waitForAnyPress();
 				scanner.scanLights(-180, 180);
-				int[] bearings = scanner.getBearings();
+				float[] bearings = scanner.getBearings();
 				dl.writeLog(bearings[0], bearings[1]);
 				System.out.println("(" + bearings[0] + ", " + 
 									bearings[1] + ")");

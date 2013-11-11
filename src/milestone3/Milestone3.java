@@ -1,7 +1,6 @@
 package milestone3;
 
 import lejos.nxt.Button;
-import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
@@ -44,7 +43,7 @@ public class Milestone3 {
 			p.setHeading((float) 90 * i);
 			for (int j = 0; j < 8; j++) { 
 				locator.setPose(p);
-				locator.locateThePose(); // bearings is only used for report
+				locator.locate(); // bearings is only used for report
 				dl.writeLog(locator._pose.getX(), locator._pose.getY(), locator._pose.getHeading());
 				dl.writeLog(locator._beaconBearing[0], locator._beaconBearing[1]);
 				Delay.msDelay(700);
@@ -52,7 +51,7 @@ public class Milestone3 {
 			pilot.rotate(90);
 		}
 		
-		//stop to check values
+		// stop to transmit data
 		Button.waitForAnyPress();
 		System.out.println("Press to continue");
 		Button.waitForAnyPress();

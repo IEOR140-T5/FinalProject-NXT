@@ -62,7 +62,6 @@ public class Controller implements CommListener {
 	 */
 	public void go() {
 		Message currentMessage;
-
 		while(true) {
 			while(!inbox.isEmpty()){
 				System.out.println("Running message!");
@@ -90,7 +89,7 @@ public class Controller implements CommListener {
 	}
 	
 	/**
-	 * Sends a CRASH message
+	 * Sends a CRASH message to the PC
 	 */
 	private void sendCrashMsg() {
 		try {
@@ -103,13 +102,12 @@ public class Controller implements CommListener {
 	/**
 	 * Parses the given message and acts on it accordingly.
 	 * 
+	 * STOP: stop the robot
 	 * MOVE: calls the navigator to move to a given x,y
-	 * TRAVEL: calls the navigator's differential pilot to 
-	 * travel a given dist
-	 * SET POSE: updates the locator's and navigator's pose to 
-	 * a given pose for human correction
+	 * FIX_POSE: fixes the position based on the bearings and echo distance
+	 * SET_POSE: updates the locator's and navigator's pose to a given pose
 	 * 
-	 * @param m
+	 * @param m - the message that represents which action to be executed
 	 */
 	private void execute(Message m) {
 		Sound.playNote(Sound.PIANO, 450, 15);
@@ -125,7 +123,6 @@ public class Controller implements CommListener {
 		case FIX_POS:
 			locator.setPose(navigator.getPoseProvider().getPose());
 			locator.locate();
-			locator.printPose();
 			navigator.getPoseProvider().setPose(locator._pose);
 			sendPose();
 			break;

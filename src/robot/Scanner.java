@@ -60,85 +60,95 @@ public class Scanner {
 		lightSensor.setFloodlight(false);
 		ultraSensor = ussensor;
 	}
-	
+
 	/**
 	 * scan both ways for 2 sets of angle, in order to calculate the mean of it
-	 * @param startAngle - where to begin scanning
-	 * @param endAngle - where to end scanning
+	 * 
+	 * @param startAngle
+	 *            - where to begin scanning
+	 * @param endAngle
+	 *            - where to end scanning
 	 */
-	public void scanLights(int startAngle, int endAngle){
+	public void scanLights(int startAngle, int endAngle) {
 		int highestLightValue = 0;
 		int[] clockwise = new int[2];
 		int[] counterClockwise = new int[2];
 		boolean isFirstLight = true;
-		
+
 		motor.rotateTo(startAngle);
-        
+
 		// sweeping counter clockwise
-        motor.rotateTo(endAngle, true);
-        while (motor.isMoving()) {
-                int currentAngle = motor.getTachoCount();
-                int currentLightValue = lightSensor.getLightValue();
-            
-                if ((currentLightValue > THRESHOLD) && (currentLightValue > highestLightValue)){
-                	highestLightValue = currentLightValue;
-                	if (isFirstLight){
-                		counterClockwise[0] = currentAngle;
-                		Sound.playNote(Sound.PIANO, 500, 5);
-                		isFirstLight = false;
-                	} else {
-                		counterClockwise[1] = currentAngle;
-                		Sound.playNote(Sound.PIANO, 150, 5);
-                		isFirstLight = true;
-                	}
-                }
-                highestLightValue = 0;
-        }
-        
-        //sweeping clockwise
-        motor.rotateTo(endAngle, true);
-        while (motor.isMoving()) {
-                int currentAngle = motor.getTachoCount();
-                int currentLightValue = lightSensor.getLightValue();
-                
-                if ((currentLightValue > THRESHOLD) && (currentLightValue > highestLightValue)){
-                	highestLightValue = currentLightValue;
-                	if (isFirstLight){
-                		clockwise[0] = currentAngle;
-                		Sound.playNote(Sound.PIANO, 150, 5);
-                		isFirstLight = false;
-                	} else {
-                		clockwise[1] = currentAngle;
-                		Sound.playNote(Sound.PIANO, 500, 5);
-                		isFirstLight = true;
-                	}
-                }
-                highestLightValue = 0;
-        }
-        
-        // calculate the mean of 2 scanning and save it to the private members
-        calculateBearings(counterClockwise, clockwise);
+		motor.rotateTo(endAngle, true);
+		while (motor.isMoving()) {
+			int currentAngle = motor.getTachoCount();
+			int currentLightValue = lightSensor.getLightValue();
+
+			if ((currentLightValue > THRESHOLD)
+					&& (currentLightValue > highestLightValue)) {
+				highestLightValue = currentLightValue;
+				if (isFirstLight) {
+					counterClockwise[0] = currentAngle;
+					Sound.playNote(Sound.PIANO, 500, 5);
+					isFirstLight = false;
+				} else {
+					counterClockwise[1] = currentAngle;
+					Sound.playNote(Sound.PIANO, 150, 5);
+					isFirstLight = true;
+				}
+			}
+			highestLightValue = 0;
+		}
+
+		// sweeping clockwise
+		motor.rotateTo(endAngle, true);
+		while (motor.isMoving()) {
+			int currentAngle = motor.getTachoCount();
+			int currentLightValue = lightSensor.getLightValue();
+
+			if ((currentLightValue > THRESHOLD)
+					&& (currentLightValue > highestLightValue)) {
+				highestLightValue = currentLightValue;
+				if (isFirstLight) {
+					clockwise[0] = currentAngle;
+					Sound.playNote(Sound.PIANO, 150, 5);
+					isFirstLight = false;
+				} else {
+					clockwise[1] = currentAngle;
+					Sound.playNote(Sound.PIANO, 500, 5);
+					isFirstLight = true;
+				}
+			}
+			highestLightValue = 0;
+		}
+
+		// calculate the mean of 2 scanning and save it to the private members
+		calculateBearings(counterClockwise, clockwise);
 	}
 
-	
 	/**
-	 * Calculates final bearings based on the bearings clockwise and counterclockwise
-	 * @param counterClockwiseBearings - counterclockwise bearings
-	 * @param clockwiseBearings - clockwise bearings
+	 * Calculates final bearings based on the bearings clockwise and
+	 * counterclockwise
+	 * 
+	 * @param counterClockwiseBearings
+	 *            - counterclockwise bearings
+	 * @param clockwiseBearings
+	 *            - clockwise bearings
 	 */
-	private void calculateBearings(int[] counterClockwiseBearings, int[] clockwiseBearings) {
+	private void calculateBearings(int[] counterClockwiseBearings,
+			int[] clockwiseBearings) {
 		for (int i = 0; i < counterClockwiseBearings.length; i++) {
-            bearings[i] = (counterClockwiseBearings[i] + clockwiseBearings[1 - i]) / 2;
+			bearings[i] = (counterClockwiseBearings[i] + clockwiseBearings[1 - i]) / 2;
 		}
 	}
-	
+
 	/**
 	 * Returns the echo distance to the wall at a given angle
-	 * @param angle the angle the head should rotate to
+	 * 
+	 * @param angle
+	 *            the angle the head should rotate to
 	 * @return the echo distance at that angle
 	 */
 	public int getDistanceToWall(float angle) {
-		//float temp = angle - 15;
 		motor.rotateTo((int) angle);
 		Sound.playNote(Sound.PIANO, 1000, 5);
 		return ultraSensor.getDistance();
@@ -146,9 +156,10 @@ public class Scanner {
 
 	/**
 	 * Gets the distance at the current heading
+	 * 
 	 * @return the distance at the current heading
 	 */
-	public int getDistance(){
+	public int getDistance() {
 		return ultraSensor.getDistance();
 	}
 
@@ -171,7 +182,7 @@ public class Scanner {
 	protected UltrasonicSensor getUltrasonicSensor() {
 		return ultraSensor;
 	}
-	
+
 	/**
 	 * @return the angle that the head is currently looking in.
 	 */

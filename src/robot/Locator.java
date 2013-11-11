@@ -83,7 +83,7 @@ public class Locator {
 	 * It will find an appropriate heading to scan 180 degree which contains 2 lights
 	 * @return the array contains 2 bearing // for milestone 3 report
 	 */
-	public void locateThePose() {
+	public void locate() {
 		float x = _pose.getX();
 		float y = _pose.getY();
 		
@@ -111,20 +111,11 @@ public class Locator {
 			beaconsBearings = reverseBeaconsBearings(beaconsBearings);
 		}
 
-		// hard code distanceToWall
-/*		if (_pose.getHeading() == 90){
-			distanceToWall += 2;
-		}
-		if (_pose.getHeading() == 180){
-			distanceToWall += 2;
-		} */
-		// for debugging
 		_beaconBearing = beaconsBearings;
 		System.out.println(distanceToWall +"," + beaconsBearings[0] + "," + beaconsBearings[1]);
 
 		// calculate the Pose
-		_pose = fixPosition(beaconsBearings, (float) distanceToWall);
-		
+		_pose = fixPosition(beaconsBearings, (float) distanceToWall);	
 	}
 	
 	/**
@@ -139,8 +130,6 @@ public class Locator {
 		return beaconsBearings;
 	}
 
-	
-	
 	/**
 	 * Calculates position from beacon coordinates and beacon bearing and echo distance
 	 * @param bearings - the bearings of the lights
