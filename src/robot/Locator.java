@@ -173,4 +173,11 @@ public class Locator {
 		return angle;
 	}
 
+	/**
+	 * Returns the scanner for manipulation in Controller
+	 * @return
+	 */
+	public Scanner getScanner() {
+		return scanner;
+	}
 }

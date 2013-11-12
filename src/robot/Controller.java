@@ -8,6 +8,7 @@ import robot.MessageType;
 import lejos.geom.Point;
 import lejos.nxt.Sound;
 import lejos.nxt.TouchSensor;
+import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
 import lejos.robotics.navigation.Pose;
 import lejos.util.Delay;
@@ -97,6 +98,31 @@ public class Controller implements CommListener {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Sends pose, if desired, every 300 ms, as well as sends
+	 * the echo distance in the direction the head is currently facing every
+	 * 50 ms, if desired.
+	 * 
+	 * @param sendPose if true, the robot will send the pose every 300 ms
+	 * @param sendObstacles if true, the robot will send the echo dist every 50 ms
+	 * 
+	 * Send Obstacles is current not implemented
+	 */
+	private void sendData(boolean sendPose, boolean sendObstacles) {
+		while (navigator.isMoving() || navigator.getMoveController().isMoving()) {
+			int obstacleDist;
+			int headAngle = locator.getScanner().getHeadAngle();
+			for (int i = 0; i < 6; i++) {
+				Delay.msDelay(50);
+				obstacleDist = locator.getScanner().getDistance();
+				if ((i == 5) && (sendPose)) {
+					sendPose();
+				}
+			}
+		}
+		sendPose();
+	}
 
 	/**
 	 * Parses the given message and acts on it accordingly.
@@ -116,14 +142,25 @@ public class Controller implements CommListener {
 			sendPose();
 			break;
 		case MOVE:
-			Pose startPose = navigator.getPoseProvider().getPose();
-			navigator.goTo(m.getData()[0], m.getData()[1]);
+			//Pose startPose = navigator.getPoseProvider().getPose();
+			float[] data = m.getData();
+			navigator.goTo(data[0], data[1]);
+			sendData(true, false);
 			break;
 		case FIX_POS:
 			locator.setPose(navigator.getPoseProvider().getPose());
 			locator.locate();
 			navigator.getPoseProvider().setPose(locator._pose);
 			sendPose();
+			break;
+		case ROTATE:
+			((DifferentialPilot) navigator.getMoveController()).rotate(m.getData()[0]);
+			sendPose();
+			break;
+		case TRAVEL:
+			//Pose startingPose = navigator.getPoseProvider().getPose();
+			navigator.getMoveController().travel(m.getData()[0], true);
+			sendData(true, false);
 			break;
 		case SET_POSE:
 			locator._pose.setLocation(m.getData()[0], m.getData()[1]);
@@ -142,5 +179,10 @@ public class Controller implements CommListener {
 	 */
 	public void objectFound(Point obstacleLocation) {		
 		sendCrashMsg();
+		navigator.stop();
+		navigator.getMoveController().stop();
+		navigator.clearPath();
+		navigator.getMoveController().travel(-5);
+		sendPose();
 	}
 }
