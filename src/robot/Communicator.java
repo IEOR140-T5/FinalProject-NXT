@@ -3,8 +3,6 @@ package robot;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import lejos.nxt.LCD;
 import lejos.nxt.Sound;
@@ -35,6 +33,7 @@ public class Communicator {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		reader.start();
 		System.out.println("Data stream opened.");
 	}
 
@@ -128,20 +127,36 @@ public class Communicator {
 						for (int i = 0; i < 2; i++) {
 							move[i] = dataIn.readFloat();
 						}
-						System.out.println(move[0] + "," + move[1]);
+						System.out.println("Move " + move[0] + "," + move[1]);
 						controller.updateMessage(new Message(header, move));
 						break;
 					case FIX_POS:
+						System.out.println("Fix pose");
 						controller.updateMessage(new Message(header, null));
 						break;
 					case STOP:
+						System.out.println("Staph");
 						controller.updateMessage(new Message(header, null));
+						break;
+					case ROTATE:
+						float[] rotate = new float[1];
+						rotate[0] = dataIn.readFloat();
+						System.out.println("Rotate " + rotate[0]);
+						controller.updateMessage(new Message(header, rotate));
+						break;
+					case TRAVEL:
+						float[] travel = new float[1];
+						travel[0] = dataIn.readFloat();
+						System.out.println("Travel " + travel[0]);
+						controller.updateMessage(new Message(header, travel));
 						break;
 					case SET_POSE:
 						float[] newPose = new float[3];
 						for (int i = 0; i < 3; i++) {
 							newPose[i] = dataIn.readFloat();
 						}
+						System.out.println("Set pose to " + newPose[0] + "," + newPose[1] + "," + 
+								newPose[2]);
 						controller.updateMessage(new Message(header, newPose));
 						break;
 					default:

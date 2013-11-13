@@ -34,6 +34,7 @@ public class Controller implements CommListener {
 		navigator = n;
 		locator = l;
 		inbox = new ArrayList<Message>();
+		//navigator.addWaypoint(0, 0);
 	}
 
 	/**
@@ -61,9 +62,10 @@ public class Controller implements CommListener {
 	 * removes messages as they come in.
 	 */
 	public void go() {
-		Message currentMessage;
+		Message currentMessage = new Message(MessageType.STOP, new float[1]);
 		while(true) {
-			while(!inbox.isEmpty()){
+			//System.out.println(currentMessage.getType());
+			while(!inbox.isEmpty()) {
 				System.out.println("Running message!");
 				currentMessage = inbox.remove(0);
 				execute(currentMessage);
