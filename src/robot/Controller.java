@@ -144,7 +144,6 @@ public class Controller implements CommListener {
 			sendPose();
 			break;
 		case MOVE:
-			//Pose startPose = navigator.getPoseProvider().getPose();
 			float[] data = m.getData();
 			navigator.goTo(data[0], data[1]);
 			sendData(true, false);
@@ -160,8 +159,7 @@ public class Controller implements CommListener {
 			sendPose();
 			break;
 		case TRAVEL:
-			//Pose startingPose = navigator.getPoseProvider().getPose();
-			navigator.getMoveController().travel(m.getData()[0], true);
+			((DifferentialPilot) navigator.getMoveController()).travel(m.getData()[0], true);
 			sendData(true, false);
 			break;
 		case SET_POSE:
