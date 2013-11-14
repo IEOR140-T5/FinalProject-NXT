@@ -4,7 +4,7 @@ import lejos.nxt.LCD;
 import lejos.robotics.navigation.Pose;
 
 /**
- * Locator class to locate and calculate the Pose 
+ * Locator class to locate and calculate the Pose
  **/
 public class Locator {
 	
@@ -13,11 +13,12 @@ public class Locator {
 	 */
 	static final float hallWidth = 241f; // cm - check with scanner
 	static final float beaconY = 241f;
-	static final float _differenceXFactor = 6.0f; // it's how off it's from the center of the robot when rotating
+	static final float differenceFactor = 5.0f; // it's how off it's from the center of the robot when rotating
 
 	// 2 Points of the 2 beacons
-	Point[] beacons = { new Point(0, 0), new Point(0, beaconY) };
+	Point[] beacon = { new Point(0, 0), new Point(0, beaconY) };
 	public Pose _pose = new Pose();
+	//public float echoDistance;
 	public float[] _beaconBearing = new float[2];
 	private Scanner scanner;
 	
@@ -51,7 +52,7 @@ public class Locator {
 		
 		// it's when x >=0 in the first Quadrant
 		boolean isFirstQuadrant = (x >=0);
-		// it's when Y location is near the zero beacon
+		// its when Y location is near the zero beacon
 		boolean isYNearZeroBeacon = y < hallWidth/2;
 		
 		if (isFirstQuadrant) {
@@ -71,8 +72,10 @@ public class Locator {
 				System.out.println("4th Quad");
 			}
 		}
+
 		 
 		float[] bearings = scanner.getBearings();
+		
 		return bearings;
 	}
 	
@@ -81,7 +84,7 @@ public class Locator {
 	 * It will find an appropriate heading to scan 180 degree which contains 2 lights
 	 * @return the array contains 2 bearing // for milestone 3 report
 	 */
-	public void locate() {
+	public float[] locateThePose() {
 		float x = _pose.getX();
 		float y = _pose.getY();
 		
@@ -101,7 +104,10 @@ public class Locator {
 		if (isYNearZeroBeacon) {
 			distanceToWall = scanner.getDistanceToWall(angleToNorthWall);
 			beaconsBearings = scanBeacons();
-			
+			// hard code
+			if ((int)_pose.getHeading() == 90){
+				
+			}
 		} else {
 			distanceToWall = (int) hallWidth - scanner.getDistanceToWall(angleToSouthWall);
 			beaconsBearings = scanBeacons();
@@ -109,11 +115,24 @@ public class Locator {
 			beaconsBearings = reverseBeaconsBearings(beaconsBearings);
 		}
 
+		// hard code
+/**		if (_pose.getHeading() == 90){
+			distanceToWall += 5;
+		}
+		if (_pose.getHeading() == 180){
+			distanceToWall += 5;
+		} **/
+		// for debugging
 		_beaconBearing = beaconsBearings;
 		System.out.println(distanceToWall +"," + beaconsBearings[0] + "," + beaconsBearings[1]);
 
 		// calculate the Pose
-		_pose = fixPosition(beaconsBearings, (float) distanceToWall);	
+		_pose = fixPosition(beaconsBearings, (float) distanceToWall);
+
+		// shift the location of the pose and set new heading
+		//_pose.setLocation(_pose.pointAt(differenceFactor, _pose.getHeading() + 180));
+		
+		return beaconsBearings;
 	}
 	
 	/**
@@ -128,12 +147,15 @@ public class Locator {
 		return beaconsBearings;
 	}
 
+	
+	
 	/**
 	 * Calculates position from beacon coordinates and beacon bearing and echo distance
 	 * @param bearings - the bearings of the lights
 	 * @param echoDistance - how far is it away from the closest wall
 	 * @return a new Pose
 	 */
+	/*
 	public Pose fixPosition(float[] bearings, float echoDistance) {
 		float x = 0;
 		float y1 = echoDistance;
@@ -148,18 +170,92 @@ public class Locator {
 		float delta = (float) (Math.pow(b, 2) - 4 * a * c);
 		float x1 = (float) (-b + Math.sqrt(delta)) / (2 * a);
 		float x2 = (float) (-b - Math.sqrt(delta)) / (2 * a);
-		float cos = (float)Math.cos(Math.toRadians(differenceInDeg));
+		
 		System.out.println(x1 + "-" + x2);
-		x = (Math.abs(differenceInDeg) < 90) ? (x1-cos) : (x2-cos);
+		x = (Math.abs(differenceInDeg) < 90) ? x1 : x2;
 		x = (isDifferenceInDegNegative) ? x*-1 : x*1;
 		
 
-		float newHeading = normalize(_pose.angleTo(beacons[0]) - bearings[0]);
+		float newHeading = normalize(_pose.angleTo(beacon[0]) - bearings[0]);
 		_pose.setHeading(newHeading);
-		_pose.setLocation(x - _differenceXFactor, echoDistance);
+
+		// hardcode heading
+		/*
+		if (_pose.getHeading() == 0){
+			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) - 10);
+		}
+		if (_pose.getHeading() == 90){
+			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) - 10);
+		}
+		if (_pose.getHeading() == 180){
+			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) + 10);
+		}
+		if (_pose.getHeading() == 270){
+			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) + 10);
+		} 0----
+		
+		_pose.setLocation(
+				(float) (x - Math.cos(Math.toRadians(newHeading))) - 6, echoDistance);
+
+		return _pose;
+	}*/
+	
+
+ 	public Pose fixPosition(float[] bearings, float echoDistance) {
+		System.out.println("FIX");
+		float Ytotal = hallWidth;
+		float x = 0;
+		float y1 = echoDistance;
+		float y2 = Ytotal - y1;
+		float theta = normalize(bearings[0] - bearings[1]);
+
+		float theta2 = (float) Math.abs(theta);
+
+		System.out.println(theta);
+
+		// Quadratic Formula Variables
+		float a = (float) Math.tan(Math.toRadians(theta2));
+		float b = -Ytotal;
+		float c = (float) -Math.tan(Math.toRadians(theta2)) * y1 * y2;
+
+		// Quadratic Formula Solutions
+		if (theta2 < 90) {
+			x = (float) (-b + Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
+		} else {
+			x = (float) (-b - Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
+		}
+
+		if (theta < 0) {
+			x *= -1;
+		}
+
+
+		float newHeading = normalize(_pose.angleTo(beacon[0]) - bearings[0]);
+		_pose.setHeading(newHeading);
+
+		// hardcode heading
+		/*
+		if (_pose.getHeading() == 0){
+			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) - 10);
+		}
+		if (_pose.getHeading() == 90){
+			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) - 10);
+		}
+		if (_pose.getHeading() == 180){
+			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) + 10);
+		}
+		if (_pose.getHeading() == 270){
+			_pose.setHeading(normalize(_pose.angleTo(beacon[0]) - bearings[0]) + 10);
+		} */
+		
+		_pose.setLocation(
+				(float) (x - Math.cos(Math.toRadians(newHeading))) - 6, echoDistance);
+
 		return _pose;
 	}
 	
+
+
 	/**
 	 * Returns angle between -180 and 180 degrees
 	 */
@@ -172,12 +268,15 @@ public class Locator {
 		}
 		return angle;
 	}
-
+	
 	/**
-	 * Returns the scanner for manipulation in Controller
-	 * @return
+	 * Prints the pose for debugging
 	 */
-	public Scanner getScanner() {
-		return scanner;
+	public void printPose() {
+		System.out.println("X: " + _pose.getX());
+		System.out.println("Y: " + _pose.getY());
+		System.out.println("H: " + _pose.getHeading());
 	}
 }
+
+

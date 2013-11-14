@@ -4,7 +4,7 @@ import lejos.nxt.LCD;
 import lejos.robotics.navigation.Pose;
 
 /**
- * Locator class to locate and calculate the Pose 
+ * Locator class to locate and calculate the Pose working
  **/
 public class Locator {
 	
