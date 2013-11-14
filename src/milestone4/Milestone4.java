@@ -11,9 +11,16 @@ import robot.*;
 public class Milestone4 {
 
 	public static void main(String[] args) {
-		double leftWheelDiameter = 5.415;
+		
+		/**
+		 * Sets the robot parameters
+		 */
+		/*double leftWheelDiameter = 5.415;
 		double rightWheelDiameter = 5.445;
-		double trackWidth = 13.65;
+		double trackWidth = 13.65;*/
+		float leftWheelDiameter = 5.42f;
+		float rightWheelDiameter = 5.44f;
+		float trackWidth = 13.72f;
 
 		DifferentialPilot dp = new DifferentialPilot(leftWheelDiameter,
 				rightWheelDiameter, trackWidth, Motor.A, Motor.C, false);
@@ -22,6 +29,9 @@ public class Milestone4 {
 		dp.setTravelSpeed(20);
 		dp.setRotateSpeed(100);
 		
+		/**
+		 * Declares objects that the robot needs to operate, and go go go
+		 */
 		Navigator navigator = new Navigator(dp);
 		
 		Scanner scanner = new Scanner(Motor.B, new LightSensor(SensorPort.S2), new UltrasonicSensor(SensorPort.S3));
@@ -31,5 +41,4 @@ public class Milestone4 {
 		Controller controller = new Controller(navigator, locator);
 		controller.go();
 	}
-
 }
