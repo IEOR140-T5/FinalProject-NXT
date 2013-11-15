@@ -25,11 +25,11 @@ NXT SIDE: Locator, Scanner, Message, MessageType, Controller, Communicator, Comm
                         dataOut.flush();
                         dataOut.writeFloat(y);
                         dataOut.flush();
-3. PC Relays type of message above (enum GOTO) via Bluetooth Connection object btc.
-4. MessageType arrives at NXT Side via Communicator class.
+3. PC Relays type of message above (enum GOTO or STOP) via Bluetooth Connection object btc.
+4. MessageType arrives at NXT Side via Communicator Class.
 5. Communicator class uses the Multi Threading Method run() to decode MessageType().
 6. run() uses a switch statement to determine MessageType() and calls updateMessage() accordingly.
-7. Control is returned the the Controller class and updateMessage runs to determine what kind of message is passed.
+7. Control is returned the the Controller class and updateMessage runs to determine what kind of Message is passed.
 8. If Message is STOP, empty entire ArrayList<Message>. navigator.stop(). And navigator.clearPath().
 9. If Messsage != STOP, append the CurrentMessage to ArrayList<Message> inbox. 
 7. After performing action, NXT uses Locator class to determine current Location.
