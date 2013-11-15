@@ -31,15 +31,9 @@ NXT SIDE: Locator, Scanner, Message, MessageType, Controller, Communicator, Comm
 6. run() uses a switch statement to determine MessageType() and calls updateMessage() accordingly.
 7. Control is returned the the Controller class and updateMessage runs to determine what kind of message is passed.
 8. If Message is STOP, empty entire ArrayList<Message>. navigator.stop(). And navigator.clearPath().
+9. If Messsage != STOP, append the CurrentMessage to ArrayList<Message> inbox. 
 7. After performing action, NXT uses Locator class to determine current Location.
 8. Current Location is Relayed back to PC.
             
     
-**Data Flow for stop() Call**:
-    
-1. GUI is built.
-2. While Rover is in motion, user clicks the STOP JButton.
-3. Our UpdateMessage() method is called to Relay the current MessageType.
-4. PC Class Controller receives the UpdatedMessage, if the message == STOP, 
-5. We do three things: clear our inbox Message Arraylist, Stop Navigator, and call clearPath on navigator.
-6. Finally, the Locator class relays current approximated Location.
+
