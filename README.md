@@ -11,14 +11,26 @@ set up the GUI that will be used throughout this entire project.
 PC SIDE: CommListener, GNC, GridControlCommunicator, MessageType, OffScreenDrawing.
 NXT SIDE: Locator, Scanner, Message, MessageType, Controller, Communicator, CommListener
                
-**Data Flow for goTo() Call**:
+**Data Flow for goTo()/STOP Call**:
     
-1. GUI is built.
-2. User Moves Mouse and Picks a Position to goTo.
-3. PC Relays type of message (enum GOTO) via Bluetooth.
-4. MessageType arrives at NXT Side.
-5. NXT Decodes the MessageType to determine which ENUM is being implemented.
-6. NXT Tells Robot to carry out assigned ENUM.
+1. GUI is built. (CommListener class)
+2. GUI adds GoToButtonActionListener().
+3. GoToButtonActionListener() calls sendMove().
+4. sendMove() parses the input text fields to get X and Y coordinates according to MouseLocation. 
+5. sendMove() uses a GridControllerNavigator object to call controller.sendDestination(x,y).
+6. GridControllerNav uses two DataStream Objects (One Input and One Output).
+7. In sendDestination:  dataOut.writeInt(MessageType.MOVE.ordinal());
+                        dataOut.flush();
+                        dataOut.writeFloat(x);
+                        dataOut.flush();
+                        dataOut.writeFloat(y);
+                        dataOut.flush();
+3. PC Relays type of message above (enum GOTO) via Bluetooth Connection object btc.
+4. MessageType arrives at NXT Side via Communicator class.
+5. Communicator class uses the Multi Threading Method run() to decode MessageType().
+6. run() uses a switch statement to determine MessageType() and calls updateMessage() accordingly.
+7. Control is returned the the Controller class and updateMessage runs to determine what kind of message is passed.
+8. If Message is STOP, empty entire ArrayList<Message>. navigator.stop(). And navigator.clearPath().
 7. After performing action, NXT uses Locator class to determine current Location.
 8. Current Location is Relayed back to PC.
             
