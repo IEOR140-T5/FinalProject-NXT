@@ -127,6 +127,7 @@ public class Locator {
 
 		// calculate the Pose
 		_pose = fixPosition(beaconsBearings, (float) distanceToWall);
+		scanner.rotateTo(0, false);
 
 		// shift the location of the pose and set new heading
 		//_pose.setLocation(_pose.pointAt(differenceFactor, _pose.getHeading() + 180));

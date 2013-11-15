@@ -18,8 +18,8 @@ public class Milestone4 {
 		/*double leftWheelDiameter = 5.415;
 		double rightWheelDiameter = 5.445;
 		double trackWidth = 13.65;*/
-		float leftWheelDiameter = 5.42f;
-		float rightWheelDiameter = 5.44f;
+		float leftWheelDiameter = 5.22f;
+		float rightWheelDiameter = 5.24f;
 		float trackWidth = 13.72f;
 
 		DifferentialPilot dp = new DifferentialPilot(leftWheelDiameter,
