@@ -70,6 +70,21 @@ NXT SIDE: Locator, Scanner, Message, MessageType, Controller, Communicator, Comm
                                                     Message
 
 
+
+
+**Data Flow Between PC and NXT**: 
+
+PC SIDE handles setting up the gui with the GridControlCommunicator class as well as the OffScreenDrawing.
+Once the GUI is setup, NXT SIDE Communicator class is able to establish a connection by using DataInput
+and DataOutputStreams. Once the connection is established, CommListener is implemented to determine any type of
+Mouse or ActionListener that the user has the ability to change based on our MessageType ENUM class. The MessageType
+ENUM class contains 9 enumators that allow the robot to manuever and perform tasks accordingly. Based on which ENUM is
+being implemented, the PC SIDE sendsMessage() to the NXT side to perform said action. This is all possible due to the
+dataOutputStreams we referred to previously. As the robot is running, the call to updateMessage() occurs whenever a new action
+or new event is produced. After performing the actions, NXT relays its position to the Locator class to determine currentLocation
+which is in turn relayed back to the PC.
+
+
 **Table of Fix Pose vs Reported Position**: 
 
                        Fix Pose (X,Y) | Reported Position (X,y)
