@@ -117,7 +117,7 @@ public class Controller implements CommListener {
 			int headAngle = locator.getScanner().getHeadAngle();
 			for (int i = 0; i < 6; i++) {
 				Delay.msDelay(50);
-				obstacleDist = locator.getScanner().getEchoDistance();
+				obstacleDist = locator.getScanner().getDistance();
 				if ((i == 5) && (sendPose)) {
 					sendPose();
 				}

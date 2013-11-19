@@ -22,6 +22,8 @@ public class Milestone4 {
 		float rightWheelDiameter = 5.24f;
 		float trackWidth = 13.72f;
 
+
+
 		DifferentialPilot dp = new DifferentialPilot(leftWheelDiameter,
 				rightWheelDiameter, trackWidth, Motor.A, Motor.C, false);
 
@@ -32,15 +34,14 @@ public class Milestone4 {
 		/**
 		 * Declares objects that the robot needs to operate, and go go go
 		 */
-		VariancePoseProvider variance = new VariancePoseProvider(dp, 0.25f, 4f);
-		Navigator navigator = new Navigator(dp, variance);
+		Navigator navigator = new Navigator(dp);
 		
 		Scanner scanner = new Scanner(Motor.B, new LightSensor(SensorPort.S2), new UltrasonicSensor(SensorPort.S3));
 		Locator locator = new Locator(scanner);
-		;
 		//TouchDetector detector = new TouchDetector(SensorPort.S1, SensorPort.S4);
 		
 		Controller controller = new Controller(navigator, locator);
 		controller.go();
+
 	}
 }

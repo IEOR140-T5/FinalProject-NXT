@@ -20,6 +20,7 @@ public class ScanTester {
 				new UltrasonicSensor(SensorPort.S3));
 		Datalogger dl = new Datalogger();
 
+		/* File Broken because we change the method
 		for (int times = 0; times < 2; times++) {
 			// Scan 8 times at the far point, then the near point
 			for (int i = 0; i < 8; i++) {
@@ -30,11 +31,12 @@ public class ScanTester {
 				System.out.println("(" + bearings[0] + ", " + 
 									bearings[1] + ")");
 			}
-
+		
 			// Transmit
 			System.out.println("Transmitting " + times + "...");
 			Button.waitForAnyPress();
 			dl.transmit();
 		}
+		*/
 	}
 }
