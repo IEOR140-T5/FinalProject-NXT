@@ -24,8 +24,8 @@ public class ScanTester {
 			// Scan 8 times at the far point, then the near point
 			for (int i = 0; i < 8; i++) {
 				Button.waitForAnyPress();
-				scanner.scanLights(-180, 180);
-				float[] bearings = scanner.getBearings();
+				scanner.lightScan(-180, 180);
+				int[] bearings = scanner.getBearings();
 				dl.writeLog(bearings[0], bearings[1]);
 				System.out.println("(" + bearings[0] + ", " + 
 									bearings[1] + ")");
