@@ -117,7 +117,7 @@ public class Controller implements CommListener {
 			int headAngle = locator.getScanner().getHeadAngle();
 			for (int i = 0; i < 6; i++) {
 				Delay.msDelay(50);
-				obstacleDist = locator.getScanner().getDistance();
+				obstacleDist = locator.getScanner().getEchoDistance();
 				if ((i == 5) && (sendPose)) {
 					sendPose();
 				}
@@ -149,10 +149,14 @@ public class Controller implements CommListener {
 			sendData(true, false);
 			break;
 		case FIX_POS:
+			System.out.println("fix pos start");
 			locator.setPose(navigator.getPoseProvider().getPose());
+			System.out.println("fix pos got the pose from nav");
 			locator.locate();
+			System.out.println("locator located");
 			navigator.getPoseProvider().setPose(locator._pose);
 			sendPose();
+			System.out.println("fix pos end");
 			break;
 		case ROTATE:
 			((DifferentialPilot) navigator.getMoveController()).rotate(m.getData()[0]);

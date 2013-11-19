@@ -32,10 +32,12 @@ public class Milestone4 {
 		/**
 		 * Declares objects that the robot needs to operate, and go go go
 		 */
-		Navigator navigator = new Navigator(dp);
+		VariancePoseProvider variance = new VariancePoseProvider(dp, 0.25f, 4f);
+		Navigator navigator = new Navigator(dp, variance);
 		
 		Scanner scanner = new Scanner(Motor.B, new LightSensor(SensorPort.S2), new UltrasonicSensor(SensorPort.S3));
 		Locator locator = new Locator(scanner);
+		;
 		//TouchDetector detector = new TouchDetector(SensorPort.S1, SensorPort.S4);
 		
 		Controller controller = new Controller(navigator, locator);
