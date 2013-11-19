@@ -37,3 +37,27 @@ NXT SIDE: Locator, Scanner, Message, MessageType, Controller, Communicator, Comm
             
     
 
+Milestone 4B:
+
+**Mission Control**: Develop our Milestone 4A code to incorporate the three following instructions: Rotate, travel,
+and Fix Position. 
+                       
+**Classes**: 
+PC SIDE: CommListener, GNC, GridControlCommunicator, MessageType, OffScreenDrawing.
+NXT SIDE: Locator, Scanner, Message, MessageType, Controller, Communicator, CommListener
+
+**Table of Fix Pose vs Reported Position**: 
+Fix Pose (X,Y) | Reported Position (X,y)
+               |
+               |
+               |
+               |
+               |
+               |
+               |
+               |
+               
+
+**Screenshot of Route Traveled**: 
+[insert image from coreys comp]
+
