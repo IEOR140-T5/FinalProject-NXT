@@ -47,15 +47,16 @@ PC SIDE: CommListener, GNC, GridControlCommunicator, MessageType, OffScreenDrawi
 NXT SIDE: Locator, Scanner, Message, MessageType, Controller, Communicator, CommListener
 
 **Table of Fix Pose vs Reported Position**: 
-Fix Pose (X,Y) | Reported Position (X,y)
-               |
-               |
-               |
-               |
-               |
-               |
-               |
-               |
+
+                       Fix Pose (X,Y) | Reported Position (X,y)
+                                      |
+                                      |
+                                      |
+                                      |
+                                      |
+                                      |
+                                      |
+                                      |
                
 
 **Screenshot of Route Traveled**: 
