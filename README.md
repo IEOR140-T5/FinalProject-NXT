@@ -39,12 +39,36 @@ NXT SIDE: Locator, Scanner, Message, MessageType, Controller, Communicator, Comm
 
 Milestone 4B:
 
-**Mission Control**: Develop our Milestone 4A code to incorporate the three following instructions: Rotate, travel,
+**Mission Control/Task Analysis**: Develop our Milestone 4A code to incorporate the three following instructions: Rotate, travel,
 and Fix Position. 
-                       
+
 **Classes**: 
 PC SIDE: CommListener, GNC, GridControlCommunicator, MessageType, OffScreenDrawing.
 NXT SIDE: Locator, Scanner, Message, MessageType, Controller, Communicator, CommListener
+                       
+**Data Flow/Relationships between classes**:
+
+                   PC SIDE                                 NXT SIDE
+                               
+         [ GridControlCommunicator ]                     [ CONTROLLER ]
+                     |                                         |
+                     |                                         |
+                     |                                         |
+                     v                                         v
+          CommListener/MessageType                        Communicator
+                  /    \                                  /          \
+                 /      \                                /            \
+                /        \                              /              \
+              GNC     OffScreenGrid                 Locator        CommListener
+                                                       |                |
+                                                       |                |
+                                                       v                v
+                                                  MessageType        Scanner
+                                                       |
+                                                       |
+                                                       v
+                                                    Message
+
 
 **Table of Fix Pose vs Reported Position**: 
 
