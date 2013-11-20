@@ -159,6 +159,18 @@ public class Communicator {
 								newPose[2]);
 						controller.updateMessage(new Message(header, newPose));
 						break;
+					case MAP:
+						float[] mapCoords = new float[3];
+						for (int i = 0; i < 3; i++) {
+							mapCoords[i] = dataIn.readFloat();
+						}
+						System.out.println("Mapping coordinates: " + mapCoords[0] + "," + mapCoords[1] + "," + 
+								mapCoords[2]);
+						controller.updateMessage(new Message(header, mapCoords));
+						break;
+					case CAPTURE:
+						System.out.println("Capture a bomb!!!");
+						controller.updateMessage(new Message(header, null));
 					default:
 						System.out.println("What the heck is this message?");
 						break;

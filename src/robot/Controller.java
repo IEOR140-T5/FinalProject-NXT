@@ -91,9 +91,25 @@ public class Controller implements CommListener {
 	}
 	
 	/**
+	 * Sends the obstacle's location to the PC
+	 * @param obstacleLocation
+	 */
+	private void sendObstacle(Point obstacleLocation) {
+		float[] array = new float[2];
+		array[0] = obstacleLocation.x;
+		array[1] = obstacleLocation.y;
+
+		try {
+			comm.send(new Message(MessageType.OBSTACLE, array));
+		} catch (IOException ioe) {
+			System.out.println("Exception thrown updating obstacle.");
+		}
+	}
+	
+	/**
 	 * Sends a CRASH message to the PC
 	 */
-	private void sendCrashMsg() {
+	private void sendCrashMessage() {
 		try {
 			comm.send(new Message(MessageType.CRASH, null));
 		} catch (IOException e) {
@@ -111,7 +127,7 @@ public class Controller implements CommListener {
 	 * 
 	 * Send Obstacles is current not implemented
 	 */
-	private void sendData(boolean sendPose, boolean sendObstacles) {
+	private void sendData(boolean sendPose, boolean sendObstacle) {
 		while (navigator.isMoving() || navigator.getMoveController().isMoving()) {
 			int obstacleDist;
 			int headAngle = locator.getScanner().getHeadAngle();
@@ -120,6 +136,9 @@ public class Controller implements CommListener {
 				obstacleDist = locator.getScanner().getDistance();
 				if ((i == 5) && (sendPose)) {
 					sendPose();
+				}
+				if (sendObstacle && (obstacleDist < 255)) {
+					//sendObstacle(1,2);
 				}
 			}
 		}
@@ -172,6 +191,10 @@ public class Controller implements CommListener {
 			navigator.getPoseProvider().setPose(locator._pose);
 			sendPose();
 			break;
+		case MAP:
+			break;
+		case CAPTURE:
+			break;
 		default:
 			break;
 		}
@@ -182,7 +205,7 @@ public class Controller implements CommListener {
 	 * Actions when we find an object at the given location
 	 */
 	public void objectFound(Point obstacleLocation) {		
-		sendCrashMsg();
+		sendCrashMessage();
 		navigator.stop();
 		navigator.getMoveController().stop();
 		navigator.clearPath();
