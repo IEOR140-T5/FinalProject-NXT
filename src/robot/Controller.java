@@ -127,7 +127,7 @@ public class Controller implements CommListener {
     }	
     
     /**
-     * 
+     * Ping the given angle
      */
     private void sendPing(float angle){
     	int obstacleDistance = locator.getScanner().getEchoDistance(angle);
@@ -190,7 +190,7 @@ public class Controller implements CommListener {
             sendData(true, true);
 			break;
 		case PING:
-			System.out.println("MAPPING");
+			System.out.println("PINGING");
 			sendPing(m.getData()[0]);
 		default:
 			System.out.println("MESSAGE NOT IN THE LIST");
