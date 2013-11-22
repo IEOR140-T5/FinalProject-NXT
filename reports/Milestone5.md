@@ -56,8 +56,20 @@ and fixing the pose when the robot reaches a corner.
             (INSERT SCREENSHOT)
             
             
+
+
+
+                                         FINAL PROJECT -- FINAL MILESTONE
             
             
+***Objective***: The final milestone for this project requires us to locate two bombs on the map and print a screenshot showing that
+                 we have found them.
+                 
+
+
+***SCREENSHOT***:
+
+           (INSERT BOMB FOUND SCREENSHOT, OF BOTH BOMBS ON OUR GUI MAP)
             
             
             
