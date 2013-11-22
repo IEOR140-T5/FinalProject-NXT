@@ -123,8 +123,16 @@ public class Controller implements CommListener {
             }
         
         }
-        sendPose();
-}	
+        sendPose();    
+    }	
+    
+    /**
+     * 
+     */
+    private void sendPing(float angle){
+    	int obstacleDistance = locator.getScanner().getEchoDistance(angle);
+    	sendWall(obstacleDistance, locator.getScanner().getHeadAngle());
+    }
 
 	/**
 	 * Parses the given message and acts on it accordingly.
@@ -181,6 +189,9 @@ public class Controller implements CommListener {
             navigator.goTo(m.getData()[0], m.getData()[1]);
             sendData(true, true);
 			break;
+		case PING:
+			System.out.println("MAPPING");
+			sendPing(m.getData()[0]);
 		default:
 			System.out.println("MESSAGE NOT IN THE LIST");
 			break;
