@@ -43,7 +43,7 @@ public class Milestone3 {
 			p.setHeading((float) 90 * i);
 			for (int j = 0; j < 8; j++) { 
 				locator.setPose(p);
-				locator.locate(); // bearings is only used for report
+				//locator.locate(); // bearings is only used for report
 				dl.writeLog(locator._pose.getX(), locator._pose.getY(), locator._pose.getHeading());
 				dl.writeLog(locator._beaconBearing[0], locator._beaconBearing[1]);
 				Delay.msDelay(700);

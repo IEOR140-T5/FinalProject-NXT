@@ -1,7 +1,7 @@
 package robot;
 
 /**
- * The message to be communicated between the robot and the PC
+ * All of the messages used to communicate between PC and NXT
  */
 public class Message {
 
@@ -10,8 +10,8 @@ public class Message {
 	
 	/**
 	 * Constructor for Message
-	 * @param mt An enum for various types of message used
-	 * @param d An array of floats that represent the data stored in the message
+	 * @param mt: message type, supposed to be an enum
+	 * @param d: array of data
 	 */
 	public Message(MessageType mt, float[] d) {
 		type = mt;
@@ -19,14 +19,14 @@ public class Message {
 	}
 	
 	/**
-	 * @return the enum associated with this message
+	 * @return return the name of the Action
 	 */
 	public MessageType getType() {
 		return type;
 	}
 	
 	/**
-	 * @return the array of floats stored within this message
+	 * @return return the data depends on what kind of action
 	 */
 	public float[] getData() {
 		return data;

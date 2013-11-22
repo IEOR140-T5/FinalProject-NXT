@@ -22,7 +22,8 @@ public class milestone5 {
 		DifferentialPilot dp = new DifferentialPilot(leftWheelDiameter,
 				rightWheelDiameter, trackWidth, Motor.A, Motor.C, false);
 
-		dp.setAcceleration(300);
+		//dp.setAcceleration(300);
+		dp.setAcceleration(100);
 		dp.setTravelSpeed(20);
 		dp.setRotateSpeed(100);
 		

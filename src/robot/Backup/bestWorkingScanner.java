@@ -72,16 +72,10 @@ public class Scanner {
 					ccwIndex++;
 					highestLightValue = 0;
 					Sound.playNote(Sound.PIANO, 200, 5);
-					Sound.playNote(Sound.PIANO, 300, 5);
-					Sound.playNote(Sound.PIANO, 400, 5);
-					Sound.playNote(Sound.PIANO, 700, 5);
 				} else if ((lv < threshold) && (!ccw && cwAssigned && cwIndex == 0)) {
 					cwIndex++;
 					highestLightValue = 0;
 					Sound.playNote(Sound.PIANO, 700, 5);
-					Sound.playNote(Sound.PIANO, 400, 5);
-					Sound.playNote(Sound.PIANO, 300, 5);
-					Sound.playNote(Sound.PIANO, 200, 5);
 				}
 
 			}
@@ -91,6 +85,8 @@ public class Scanner {
 
 		calculateBearingsFromLightValues(ccwBearings, cwBearings);
 	}
+
+
 	/**
 	 * Takes both sets of bearings found from the clockwise scan and the counterclockwise
 	 * scans, then combines them to create a set of true bearings to the beacons.
@@ -148,11 +144,40 @@ public class Scanner {
 		return ultraSensor.getDistance();
 	}
 
+	/**
+	 * Returns the echo distance to something at a specific angle.
+	 * 
+	 * @param angle the angle the head should go to
+	 * @return the echo distance at that angle
+	 */
+	public int getDistance(float angle) {
+		//Given angle from heading to wall, get the distance to that wall
+
+		while (Math.abs(angle - motor.getTachoCount()) > 180) {
+			if (angle > motor.getTachoCount()) {
+				angle -= 360;
+			} else {
+				angle += 360;
+			}
+		}
+
+		motor.rotateTo((int) angle);
+
+		return ultraSensor.getDistance();
+	}
 	/** 
 	 * Returns the echo distance at the angle the scanner head is currently facing
 	 * @return the echo distance
 	 */
 	public int getEchoDistance() {
+		return ultraSensor.getDistance();
+	}
+
+	/** 
+	 * Returns the echo distance at the angle the scanner head is currently facing
+	 * @return the echo distance
+	 */
+	public int getDistance() {
 		return ultraSensor.getDistance();
 	}
 
@@ -188,7 +213,10 @@ public class Scanner {
 	public int[] getBearings() {
 		return bearings;
 	}
+	
+	public void rotate(float angle, boolean what){
+		motor.rotate((int) angle, what);
+	}
 
 }
-
 

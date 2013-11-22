@@ -14,68 +14,60 @@ import lejos.robotics.navigation.Pose;
 import lejos.util.Delay;
 
 /**
- * Controls the robot by coordinating messages that come in to 
- * the bluetooth communicator with actions that must be performed
- * by the navigator or the locator
+ * Main controller of the NXT brick, it will take in the message sent by the PC
+ * via bluetooth, put it in queue, pop it and execute it
  * 
- * Also listens to the touch detector and tells the robot to 
- * back up when it hits something
+ * Listener template from professor Glassy
  */
+
 public class Controller implements CommListener {
 	private Navigator navigator;
-	private Communicator comm;
-	private ArrayList<Message> inbox;
+	private Communicator communicator;
+	private ArrayList<Message> queue;
 	private Locator locator;
 
-	public Controller(Navigator n, Locator l) {
+	public Controller(Navigator nav, Locator loc) {
 		System.out.println("Connecting...");
-		comm = new Communicator();
-		comm.setController(this);
-		navigator = n;
-		locator = l;
-		inbox = new ArrayList<Message>();
+		communicator = new Communicator();
+		communicator.setController(this);
+		navigator = nav; 
+		locator = loc;
+		queue = new ArrayList<Message>();
 		//navigator.addWaypoint(0, 0);
 	}
 
 	/**
-	 * Puts the given message in the robot controller's inbox.
+	 * Save the message inside the inbox to execute
+	 * If the message is STOP then clear out everything
 	 * 
-	 * For any messages besides STOP, they will be read first-in first-out
-	 * A STOP message will clear the controller's inbox and its current path
-	 * and tell the navigator to stop.
-	 * 
-	 * @param m the message to be put in the inbox
+	 * @param message: message
 	 */
-	public void updateMessage(Message m) {
-		System.out.println("Updating messages...");
-		if(m.getType() == MessageType.STOP) {
-			inbox.clear();
+	public void updateMessage(Message message) {
+		if(message.getType() == MessageType.STOP) {
+			queue.clear();
 			navigator.stop();
 			navigator.clearPath();
 		} else {
-			inbox.add(m);
+			queue.add(message);
 		}
 	}
 
 	/**
-	 * Listens to the inbox for new messages, executes and 
-	 * removes messages as they come in.
+	 * Check the queue and execute everything
 	 */
 	public void go() {
 		Message currentMessage = new Message(MessageType.STOP, new float[1]);
 		while(true) {
 			//System.out.println(currentMessage.getType());
-			while(!inbox.isEmpty()) {
-				System.out.println("Running message!");
-				currentMessage = inbox.remove(0);
+			while(!queue.isEmpty()) {
+				currentMessage = queue.remove(0);
 				execute(currentMessage);
 			}
 		}
 	}
 	
 	/**
-	 * Gets the current pose from the navigator and passes a message
-	 * to the communicator for it to send to the PC
+	 * Send the pose back to the PC to update
 	 */
 	private void sendPose() {
 		Pose pose = navigator.getPoseProvider().getPose();
@@ -84,66 +76,55 @@ public class Controller implements CommListener {
 		array[1] = pose.getY();
 		array[2] = pose.getHeading();
 		try {
-			comm.send(new Message(MessageType.POS_UPDATE, array));
+			communicator.send(new Message(MessageType.POS_UPDATE, array));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	/**
-	 * Sends the obstacle's location to the PC
-	 * @param obstacleLocation
+	 * Send the wall location back to PC
 	 */
-	private void sendObstacle(Point obstacleLocation) {
-		float[] array = new float[2];
-		array[0] = obstacleLocation.x;
-		array[1] = obstacleLocation.y;
+    private void sendWall(int obstacleDistance, int angle) {
+        float[] sendBackPoint = new float[2];
+        Pose pose = navigator.getPoseProvider().getPose();
+        Point whereWeAre = pose.pointAt(obstacleDistance, angle + pose.getHeading());
 
-		try {
-			comm.send(new Message(MessageType.OBSTACLE, array));
-		} catch (IOException ioe) {
-			System.out.println("Exception thrown updating obstacle.");
-		}
-	}
+        sendBackPoint[0] = whereWeAre.x;
+        sendBackPoint[1] = whereWeAre.y;
+
+        try {
+                communicator.send(new Message(MessageType.WALL, sendBackPoint));
+        } catch (IOException e) {
+                System.out.println("Exception at WALL - SENDOBSTACLE");
+        }
+    }	
+	
 	
 	/**
-	 * Sends a CRASH message to the PC
-	 */
-	private void sendCrashMessage() {
-		try {
-			comm.send(new Message(MessageType.CRASH, null));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Sends pose, if desired, every 300 ms, as well as sends
-	 * the echo distance in the direction the head is currently facing every
-	 * 50 ms, if desired.
+	 * Send Pose back to PC, depending on what type it is.
+	 * This method is used for both sending pose back or sending pose and wall location back
 	 * 
-	 * @param sendPose if true, the robot will send the pose every 300 ms
-	 * @param sendObstacles if true, the robot will send the echo dist every 50 ms
+	 * @param sendPose: send Pose true/false
+	 * @param sendWall: send wall location if set true
 	 * 
-	 * Send Obstacles is current not implemented
 	 */
-	private void sendData(boolean sendPose, boolean sendObstacle) {
-		while (navigator.isMoving() || navigator.getMoveController().isMoving()) {
-			int obstacleDist;
-			int headAngle = locator.getScanner().getHeadAngle();
-			for (int i = 0; i < 6; i++) {
-				Delay.msDelay(50);
-				obstacleDist = locator.getScanner().getDistance();
-				if ((i == 5) && (sendPose)) {
-					sendPose();
-				}
-				if (sendObstacle && (obstacleDist < 255)) {
-					//sendObstacle(1,2);
-				}
-			}
-		}
-		sendPose();
-	}
+    private void sendData(boolean sendPose, boolean sendWall) {
+        while (navigator.isMoving() || navigator.getMoveController().isMoving()) {
+            int obstaceDistance;
+            // headAngle = getTachoCount()
+            int currentHeadAngle = locator.getScanner().getHeadAngle();
+            
+            sendPose();
+            // getEchoDistance = ultrasonic.getDistance()
+            obstaceDistance = locator.getScanner().getEchoDistance();
+            if (sendWall && (obstaceDistance < 30)) {
+                sendWall(obstaceDistance, currentHeadAngle);
+            }
+        
+        }
+        sendPose();
+}	
 
 	/**
 	 * Parses the given message and acts on it accordingly.
@@ -168,48 +149,41 @@ public class Controller implements CommListener {
 			sendData(true, false);
 			break;
 		case FIX_POS:
-			System.out.println("fix pos start");
+			System.out.println("FIX POSE");
 			locator.setPose(navigator.getPoseProvider().getPose());
-			System.out.println("fix pos got the pose from nav");
-			locator.locate();
-			System.out.println("locator located");
+			locator.locateMeAndShiftMe();
 			navigator.getPoseProvider().setPose(locator._pose);
 			sendPose();
-			System.out.println("fix pos end");
 			break;
 		case ROTATE:
+			System.out.println("ROTATE");
 			((DifferentialPilot) navigator.getMoveController()).rotate(m.getData()[0]);
 			sendPose();
 			break;
 		case TRAVEL:
+			System.out.println("TRAVEL");
 			((DifferentialPilot) navigator.getMoveController()).travel(m.getData()[0], true);
 			sendData(true, false);
 			break;
 		case SET_POSE:
+			System.out.println("SET POSE");
 			locator._pose.setLocation(m.getData()[0], m.getData()[1]);
 			locator._pose.setHeading(m.getData()[2]);
 			navigator.getPoseProvider().setPose(locator._pose);
 			sendPose();
 			break;
-		case MAP:
-			break;
-		case CAPTURE:
+		case SEND_MAP:
+            //Pose starterPose = navigator.getPoseProvider().getPose();
+			System.out.println("MAPPING");
+            locator.getScanner().rotateHeadTo(m.getData()[2]);
+			
+			//locator.getScanner().rotate(m.getData()[2], false);
+            navigator.goTo(m.getData()[0], m.getData()[1]);
+            sendData(true, true);
 			break;
 		default:
+			System.out.println("MESSAGE NOT IN THE LIST");
 			break;
 		}
-		Sound.playNote(Sound.PIANO, 500, 15);
 	} 
-
-	/**
-	 * Actions when we find an object at the given location
-	 */
-	public void objectFound(Point obstacleLocation) {		
-		sendCrashMessage();
-		navigator.stop();
-		navigator.getMoveController().stop();
-		navigator.clearPath();
-		navigator.getMoveController().travel(-5);
-		sendPose();
-	}
 }

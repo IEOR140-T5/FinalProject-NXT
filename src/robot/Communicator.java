@@ -10,8 +10,9 @@ import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
 
 /**
- * The Communicator connects to the PC through a bluetooth channel and
- * receives/sends messages.
+ * Communicator takes care of the communication between the NXT and the PC part
+ * by using bluetooth connection
+ * Based on the Original Communicator by professor Glassy
  */
 public class Communicator {
 	private BTConnection btc;
@@ -21,8 +22,7 @@ public class Communicator {
 	private Controller controller;
 
 	/**
-	 * Creates a BTCommunicator object and connects it to the computer, then
-	 * sets up the data streams and such.
+	 * Start the communicator
 	 */
 	public Communicator() {
 		reader = new Reader();
@@ -46,7 +46,7 @@ public class Communicator {
 	}
 	
 	/**
-	 * Establishes a bluetooth connection with the computer.
+	 * Start connecting and wait for the bluetooth to finish connecting
 	 */
 	public void connect() {
 		LCD.drawString("connecting...", 0, 0);
@@ -75,11 +75,10 @@ public class Communicator {
 			}
 		}
 		Sound.playNote(Sound.PIANO, 444, 12);
-		LCD.drawString("Send", 0, 0);
 	}
 
 	/**
-	 * Closes everything
+	 * Close on exit
 	 * 
 	 * @throws IOException
 	 */
@@ -90,8 +89,7 @@ public class Communicator {
 	}
 
 	/**
-	 * reads the data input stream, and calls DrawRobotPath() and DrawObstacle()
-	 * uses OffScreenDrawing, dataIn
+	 * Read the inputsteam and execute everything
 	 * 
 	 * @author Roger Glassey
 	 */
@@ -101,20 +99,12 @@ public class Communicator {
 		boolean isRunning = false;
 
 		/**
-		 * Runs the reader and takes in readings that the robot sends. The
-		 * robot's communications contain two parts: a MessageType that
-		 * indicates what the message means the robot to do, and an array of
-		 * floats that represent the data included in that message.
-		 * 
-		 * The size of the float array depends on the message type, so this
-		 * method must parse the message type to construct a message object with
-		 * an accurate amount of data.
-		 * 
+		 * While running, the controller will take the message from the PC, put it in the queue and
+		 * execute it.
 		 */
 		public void run() {
 			System.out.println(" reader started GridControlComm1 ");
 			isRunning = true;
-			Sound.playNote(Sound.PIANO, 500, 50);
 			while (isRunning) {
 				try {
 					int headerNumber = dataIn.readInt();
@@ -135,7 +125,7 @@ public class Communicator {
 						controller.updateMessage(new Message(header, null));
 						break;
 					case STOP:
-						System.out.println("Staph");
+						System.out.println("Stop");
 						controller.updateMessage(new Message(header, null));
 						break;
 					case ROTATE:
@@ -159,18 +149,16 @@ public class Communicator {
 								newPose[2]);
 						controller.updateMessage(new Message(header, newPose));
 						break;
-					case MAP:
-						float[] mapCoords = new float[3];
+					case SEND_MAP:
+						float[] whereToStop = new float[3];
 						for (int i = 0; i < 3; i++) {
-							mapCoords[i] = dataIn.readFloat();
+							whereToStop[i] = dataIn.readFloat();
 						}
-						System.out.println("Mapping coordinates: " + mapCoords[0] + "," + mapCoords[1] + "," + 
-								mapCoords[2]);
-						controller.updateMessage(new Message(header, mapCoords));
+						System.out.println("Map");
+						System.out.println("Mapping coordinates: " + whereToStop[0] + "," + whereToStop[1] + "," + 
+								whereToStop[2]);
+						controller.updateMessage(new Message(header, whereToStop));
 						break;
-					case CAPTURE:
-						System.out.println("Capture a bomb!!!");
-						controller.updateMessage(new Message(header, null));
 					default:
 						System.out.println("What the heck is this message?");
 						break;
