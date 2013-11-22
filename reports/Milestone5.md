@@ -1,4 +1,4 @@
-FINAL PROJECT -- MILESTONE 5
+                                             FINAL PROJECT -- MILESTONE 5A
 
 
 
@@ -36,5 +36,30 @@ and fixing the pose when the robot reaches a corner.
                         |
                         |
                         |
+
+
+
+                                          FINAL PROJECT -- MILESTONE 5B
+                                                            
+***Objective***: Milestone 5B requires the same specifications as Milestone 5A, however, we are now navigating a more complex map.                                               
+                                                            
+***Modifications to Code***: The changes to our code include: 
+
+                                                            1.
+                                                            2.
+                                                            3.
+                                                            4.
+                                                            5.
+                                                            
+***SCREENSHOT***:
+
+            (INSERT SCREENSHOT)
+            
+            
+            
+            
+            
+            
+            
 
 
