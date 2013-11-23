@@ -25,6 +25,7 @@ public class Controller implements CommListener {
 	private Communicator communicator;
 	private ArrayList<Message> queue;
 	private Locator locator;
+	private int _obstacleDistance = 45;
 
 	public Controller(Navigator nav, Locator loc) {
 		System.out.println("Connecting...");
@@ -118,7 +119,7 @@ public class Controller implements CommListener {
             sendPose();
             // getEchoDistance = ultrasonic.getDistance()
             obstaceDistance = locator.getScanner().getEchoDistance();
-            if (sendWall && (obstaceDistance < 30)) {
+            if (sendWall && (obstaceDistance < _obstacleDistance)) {
                 sendWall(obstaceDistance, currentHeadAngle);
             }
         
@@ -129,9 +130,28 @@ public class Controller implements CommListener {
     /**
      * Ping the given angle
      */
-    private void sendPing(float angle){
+    private void sendEcho(float angle){
     	int obstacleDistance = locator.getScanner().getEchoDistance(angle);
     	sendWall(obstacleDistance, locator.getScanner().getHeadAngle());
+    }
+    
+    /**
+     * Ping the surrounding area
+     */
+    private void sendPingAll(){
+    	int startAngle = 90;
+    	int endAngle = -90;
+    	locator.getScanner().rotateHeadTo(startAngle);
+    	locator.getScanner().rotateHeadTo(endAngle);
+    	while (locator.getScanner().getMotor().isMoving()){
+    		int obstaceDistance;
+    		int currentHeadAngle = locator.getScanner().getHeadAngle();
+            obstaceDistance = locator.getScanner().getEchoDistance();
+            if (obstaceDistance < 100) {
+                sendWall(obstaceDistance, currentHeadAngle);
+            }
+    	}
+    	
     }
 
 	/**
@@ -189,9 +209,14 @@ public class Controller implements CommListener {
             navigator.goTo(m.getData()[0], m.getData()[1]);
             sendData(true, true);
 			break;
+		case ECHO:
+			System.out.println("ECHOING");
+			sendEcho(m.getData()[0]);
+			break;
 		case PING:
 			System.out.println("PINGING");
-			sendPing(m.getData()[0]);
+			sendPingAll();
+			break;
 		default:
 			System.out.println("MESSAGE NOT IN THE LIST");
 			break;
