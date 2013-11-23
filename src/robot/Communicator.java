@@ -159,6 +159,14 @@ public class Communicator {
 								whereToStop[2]);
 						controller.updateMessage(new Message(header, whereToStop));
 						break;
+					case ECHO:
+						System.out.println("Echo");
+						controller.updateMessage(new Message(header, null));
+						break;
+					case PING:
+						System.out.println("Ping");
+						controller.updateMessage(new Message(header, null));
+						break;
 					default:
 						System.out.println("What the heck is this message?");
 						break;
