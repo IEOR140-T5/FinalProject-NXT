@@ -25,7 +25,7 @@ public class Controller implements CommListener {
 	private Communicator communicator;
 	private ArrayList<Message> queue;
 	private Locator locator;
-	private int _obstacleDistance = 45;
+	private int _obstacleDistance = 245;
 
 	public Controller(Navigator nav, Locator loc) {
 		System.out.println("Connecting...");
