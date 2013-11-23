@@ -128,11 +128,12 @@ public class Controller implements CommListener {
     }	
     
     /**
-     * Ping the given angle
+     * Ping the given current angle
      */
-    private void sendEcho(float angle){
-    	int obstacleDistance = locator.getScanner().getEchoDistance(angle);
-    	sendWall(obstacleDistance, locator.getScanner().getHeadAngle());
+    private void sendEcho(){
+    	int currentAngle = locator.getScanner().getHeadAngle();
+    	int obstacleDistance = locator.getScanner().getEchoDistance(currentAngle);
+    	sendWall(obstacleDistance, currentAngle);
     }
     
     /**
@@ -211,7 +212,7 @@ public class Controller implements CommListener {
 			break;
 		case ECHO:
 			System.out.println("ECHOING");
-			sendEcho(m.getData()[0]);
+			sendEcho();
 			break;
 		case PING:
 			System.out.println("PINGING");
