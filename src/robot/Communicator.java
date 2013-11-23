@@ -163,7 +163,7 @@ public class Communicator {
 						System.out.println("Echo");
 						controller.updateMessage(new Message(header, null));
 						break;
-					case PING:
+					case EXPLORE:
 						System.out.println("Ping");
 						controller.updateMessage(new Message(header, null));
 						break;

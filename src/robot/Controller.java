@@ -214,7 +214,7 @@ public class Controller implements CommListener {
 			System.out.println("ECHOING");
 			sendEcho();
 			break;
-		case PING:
+		case EXPLORE:
 			System.out.println("PINGING");
 			sendPingAll();
 			break;
