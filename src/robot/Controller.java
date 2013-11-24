@@ -128,12 +128,12 @@ public class Controller implements CommListener {
     }	
     
     /**
-     * Ping the given current angle
+     * Ping the given angle
      */
-    private void sendEcho(){
-    	int currentAngle = locator.getScanner().getHeadAngle();
-    	int obstacleDistance = locator.getScanner().getEchoDistance(currentAngle);
-    	sendWall(obstacleDistance, currentAngle);
+    private void sendEcho(float angle){
+    	locator.getScanner().rotateHeadTo(angle);
+    	int obstacleDistance = locator.getScanner().getEchoDistance(angle);
+    	sendWall(obstacleDistance, (int)angle);
     }
     
     /**
@@ -143,12 +143,13 @@ public class Controller implements CommListener {
     	int startAngle = 90;
     	int endAngle = -90;
     	locator.getScanner().rotateHeadTo(startAngle);
-    	locator.getScanner().rotateHeadTo(endAngle);
+    	Delay.msDelay(200);
+    	locator.getScanner().rotateTo(endAngle, true);
     	while (locator.getScanner().getMotor().isMoving()){
     		int obstaceDistance;
     		int currentHeadAngle = locator.getScanner().getHeadAngle();
             obstaceDistance = locator.getScanner().getEchoDistance();
-            if (obstaceDistance < 100) {
+            if (obstaceDistance < _obstacleDistance) {
                 sendWall(obstaceDistance, currentHeadAngle);
             }
     	}
@@ -189,6 +190,10 @@ public class Controller implements CommListener {
 			((DifferentialPilot) navigator.getMoveController()).rotate(m.getData()[0]);
 			sendPose();
 			break;
+		case ROTATE_TO:
+			System.out.println("ROTATE TO");
+			//((DifferentialPilot) navigator.getMoveController()).rotateTo(m.getData()[0]);
+			break;
 		case TRAVEL:
 			System.out.println("TRAVEL");
 			((DifferentialPilot) navigator.getMoveController()).travel(m.getData()[0], true);
@@ -212,7 +217,7 @@ public class Controller implements CommListener {
 			break;
 		case ECHO:
 			System.out.println("ECHOING");
-			sendEcho();
+			sendEcho(m.getData()[0]);
 			break;
 		case EXPLORE:
 			System.out.println("PINGING");

@@ -134,6 +134,12 @@ public class Communicator {
 						System.out.println("Rotate " + rotate[0]);
 						controller.updateMessage(new Message(header, rotate));
 						break;
+					case ROTATE_TO:
+						float[] rotateTo = new float[1];
+						rotateTo[0] = dataIn.readFloat();
+						System.out.println("Rotate to " + rotateTo[0]);
+						controller.updateMessage(new Message(header, rotateTo));						
+						break;
 					case TRAVEL:
 						float[] travel = new float[1];
 						travel[0] = dataIn.readFloat();
@@ -161,7 +167,9 @@ public class Communicator {
 						break;
 					case ECHO:
 						System.out.println("Echo");
-						controller.updateMessage(new Message(header, null));
+						float[] echo = new float[1];
+						echo[0] = dataIn.readFloat();
+						controller.updateMessage(new Message(header, echo));
 						break;
 					case EXPLORE:
 						System.out.println("Ping");

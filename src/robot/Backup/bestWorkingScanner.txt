@@ -218,5 +218,12 @@ public class Scanner {
 		motor.rotate((int) angle, what);
 	}
 
+	public NXTRegulatedMotor getMotor(){
+		return motor;
+	}
+	
+	public void rotateTo(int angle, boolean needToReturn){
+		motor.rotateTo(angle, needToReturn);
+	}
 }
 

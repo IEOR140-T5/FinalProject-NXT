@@ -150,5 +150,16 @@ public class Scanner {
 		return beaconBearings;
 	}
 
+	public void rotate(float angle, boolean what){
+		motor.rotate((int) angle, what);
+	}
+
+	public NXTRegulatedMotor getMotor(){
+		return motor;
+	}
+	
+	public void rotateTo(int angle, boolean needToReturn){
+		motor.rotateTo(angle, needToReturn);
+	}
 }
 
