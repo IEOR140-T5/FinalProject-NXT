@@ -134,6 +134,12 @@ public class Communicator {
 						System.out.println("Rotate " + rotate[0]);
 						controller.updateMessage(new Message(header, rotate));
 						break;
+					case ROTATE_TO:
+						float[] rotateTo = new float[1];
+						rotateTo[0] = dataIn.readFloat();
+						System.out.println("Rotate to " + rotateTo[0]);
+						controller.updateMessage(new Message(header, rotateTo));						
+						break;
 					case TRAVEL:
 						float[] travel = new float[1];
 						travel[0] = dataIn.readFloat();
@@ -158,6 +164,16 @@ public class Communicator {
 						System.out.println("Mapping coordinates: " + whereToStop[0] + "," + whereToStop[1] + "," + 
 								whereToStop[2]);
 						controller.updateMessage(new Message(header, whereToStop));
+						break;
+					case ECHO:
+						System.out.println("Echo");
+						float[] echo = new float[1];
+						echo[0] = dataIn.readFloat();
+						controller.updateMessage(new Message(header, echo));
+						break;
+					case EXPLORE:
+						System.out.println("Ping");
+						controller.updateMessage(new Message(header, null));
 						break;
 					default:
 						System.out.println("What the heck is this message?");

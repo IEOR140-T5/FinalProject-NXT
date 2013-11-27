@@ -25,6 +25,7 @@ public class Controller implements CommListener {
 	private Communicator communicator;
 	private ArrayList<Message> queue;
 	private Locator locator;
+	private int _obstacleDistance = 245;
 
 	public Controller(Navigator nav, Locator loc) {
 		System.out.println("Connecting...");
@@ -118,7 +119,7 @@ public class Controller implements CommListener {
             sendPose();
             // getEchoDistance = ultrasonic.getDistance()
             obstaceDistance = locator.getScanner().getEchoDistance();
-            if (sendWall && (obstaceDistance < 30)) {
+            if (sendWall && (obstaceDistance < _obstacleDistance)) {
                 sendWall(obstaceDistance, currentHeadAngle);
             }
         
@@ -129,9 +130,30 @@ public class Controller implements CommListener {
     /**
      * Ping the given angle
      */
-    private void sendPing(float angle){
+    private void sendEcho(float angle){
+    	locator.getScanner().rotateHeadTo(angle);
     	int obstacleDistance = locator.getScanner().getEchoDistance(angle);
-    	sendWall(obstacleDistance, locator.getScanner().getHeadAngle());
+    	sendWall(obstacleDistance, (int)angle);
+    }
+    
+    /**
+     * Ping the surrounding area
+     */
+    private void sendPingAll(){
+    	int startAngle = 90;
+    	int endAngle = -90;
+    	locator.getScanner().rotateHeadTo(startAngle);
+    	Delay.msDelay(200);
+    	locator.getScanner().rotateTo(endAngle, true);
+    	while (locator.getScanner().getMotor().isMoving()){
+    		int obstaceDistance;
+    		int currentHeadAngle = locator.getScanner().getHeadAngle();
+            obstaceDistance = locator.getScanner().getEchoDistance();
+            if (obstaceDistance < _obstacleDistance) {
+                sendWall(obstaceDistance, currentHeadAngle);
+            }
+    	}
+    	
     }
 
 	/**
@@ -168,6 +190,10 @@ public class Controller implements CommListener {
 			((DifferentialPilot) navigator.getMoveController()).rotate(m.getData()[0]);
 			sendPose();
 			break;
+		case ROTATE_TO:
+			System.out.println("ROTATE TO");
+			//((DifferentialPilot) navigator.getMoveController()).rotateTo(m.getData()[0]);
+			break;
 		case TRAVEL:
 			System.out.println("TRAVEL");
 			((DifferentialPilot) navigator.getMoveController()).travel(m.getData()[0], true);
@@ -189,9 +215,14 @@ public class Controller implements CommListener {
             navigator.goTo(m.getData()[0], m.getData()[1]);
             sendData(true, true);
 			break;
-		case PING:
+		case ECHO:
+			System.out.println("ECHOING");
+			sendEcho(m.getData()[0]);
+			break;
+		case EXPLORE:
 			System.out.println("PINGING");
-			sendPing(m.getData()[0]);
+			sendPingAll();
+			break;
 		default:
 			System.out.println("MESSAGE NOT IN THE LIST");
 			break;
