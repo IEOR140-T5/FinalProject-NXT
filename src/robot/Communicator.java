@@ -103,86 +103,11 @@ public class Communicator {
 		 * execute it.
 		 */
 		public void run() {
-			System.out.println(" reader started GridControlComm1 ");
+			System.out.println("Ready to go ...");
 			isRunning = true;
 			while (isRunning) {
-				try {
-					int headerNumber = dataIn.readInt();
-					MessageType header = MessageType.values()[headerNumber];
-					System.out.println(header.toString());
-					Sound.playNote(Sound.PIANO, 600, 15);
-					switch (header) {
-					case MOVE:
-						float[] move = new float[3];
-						for (int i = 0; i < 2; i++) {
-							move[i] = dataIn.readFloat();
-						}
-						System.out.println("Move " + move[0] + "," + move[1]);
-						controller.updateMessage(new Message(header, move));
-						break;
-					case FIX_POS:
-						System.out.println("Fix pose");
-						controller.updateMessage(new Message(header, null));
-						break;
-					case STOP:
-						System.out.println("Stop");
-						controller.updateMessage(new Message(header, null));
-						break;
-					case ROTATE:
-						float[] rotate = new float[1];
-						rotate[0] = dataIn.readFloat();
-						System.out.println("Rotate " + rotate[0]);
-						controller.updateMessage(new Message(header, rotate));
-						break;
-					case ROTATE_TO:
-						float[] rotateTo = new float[1];
-						rotateTo[0] = dataIn.readFloat();
-						System.out.println("Rotate to " + rotateTo[0]);
-						controller.updateMessage(new Message(header, rotateTo));						
-						break;
-					case TRAVEL:
-						float[] travel = new float[1];
-						travel[0] = dataIn.readFloat();
-						System.out.println("Travel " + travel[0]);
-						controller.updateMessage(new Message(header, travel));
-						break;
-					case SET_POSE:
-						float[] newPose = new float[3];
-						for (int i = 0; i < 3; i++) {
-							newPose[i] = dataIn.readFloat();
-						}
-						System.out.println("Set pose to " + newPose[0] + "," + newPose[1] + "," + 
-								newPose[2]);
-						controller.updateMessage(new Message(header, newPose));
-						break;
-					case SEND_MAP:
-						float[] whereToStop = new float[3];
-						for (int i = 0; i < 3; i++) {
-							whereToStop[i] = dataIn.readFloat();
-						}
-						System.out.println("Map");
-						System.out.println("Mapping coordinates: " + whereToStop[0] + "," + whereToStop[1] + "," + 
-								whereToStop[2]);
-						controller.updateMessage(new Message(header, whereToStop));
-						break;
-					case ECHO:
-						System.out.println("Echo");
-						float[] echo = new float[1];
-						echo[0] = dataIn.readFloat();
-						controller.updateMessage(new Message(header, echo));
-						break;
-					case EXPLORE:
-						System.out.println("Ping");
-						controller.updateMessage(new Message(header, null));
-						break;
-					default:
-						System.out.println("What the heck is this message?");
-						break;
-					}
-				} catch (IOException e) {
-					System.out.println("Read Exception in GridControlComm");
-					count++;
-				}
+				// start transmitting the message to the Controller
+				controller.decodeData(dataIn, dataOut);
 			}
 		}
 	}
