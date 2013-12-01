@@ -8,7 +8,7 @@ import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
 import robot.*;
 
-public class milestone5 {
+public class Milestone5 {
 
 	public static void main(String[] args) {
 		

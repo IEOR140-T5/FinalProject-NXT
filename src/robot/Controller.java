@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import robot.TouchDetector;
 import robot.Message;
 import robot.MessageType;
 import lejos.geom.Point;
@@ -28,7 +29,13 @@ public class Controller implements CommListener {
 	private ArrayList<Message> queue;
 	private Locator locator;
 	private int _obstacleDistance = 245;
+	private TouchDetector detector;
 
+	/**
+	 * Constructor that takes in Navigator and Locator
+	 * @param nav
+	 * @param loc
+	 */
 	public Controller(Navigator nav, Locator loc) {
 		System.out.println("Connecting...");
 		communicator = new Communicator();
@@ -36,7 +43,22 @@ public class Controller implements CommListener {
 		navigator = nav; 
 		locator = loc;
 		queue = new ArrayList<Message>();
-		//navigator.addWaypoint(0, 0);
+	}
+	
+	/**
+	 * Constructor that takes in Navigator and Locator and TouchDetector
+	 * @param nav
+	 * @param loc
+	 * @param td
+	 */
+	public Controller(Navigator nav, Locator loc, TouchDetector td) {
+		System.out.println("Connecting...");
+		communicator = new Communicator();
+		communicator.setController(this);
+		navigator = nav; 
+		locator = loc;
+		detector = td;
+		queue = new ArrayList<Message>();
 	}
 
 	/**
