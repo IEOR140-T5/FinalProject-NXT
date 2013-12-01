@@ -58,6 +58,7 @@ public class Controller implements CommListener {
 		navigator = nav; 
 		locator = loc;
 		detector = td;
+		detector.setObstacleListener(this);
 		queue = new ArrayList<Message>();
 	}
 
@@ -91,6 +92,24 @@ public class Controller implements CommListener {
 		}
 	}
 	
+    public void touchSensorTouched(boolean isLeftTouched, boolean isRightTouched) {
+    	int distance = 14;
+    	int angleToWall = 25;
+		//obstacleLocation = new PolarPoint((int) Math.round(7 * 2.54), -25);
+        if (isLeftTouched){
+        	sendWall(distance, -angleToWall);
+        } else {
+        	sendWall(distance, angleToWall);
+        	
+        }
+        sendTouchedState();
+        navigator.stop();
+        //navigator.getMoveController().stop();
+        navigator.clearPath();
+        //navigator.getMoveController().travel(-5);
+        sendPose();
+    }
+	
 	/**
 	 * Send the pose back to the PC to update
 	 */
@@ -108,6 +127,19 @@ public class Controller implements CommListener {
 	}
 	
 	/**
+	 * Send the message back to PC and let it hand this case
+	 * either prints out the message to let the user knows
+	 * or do something else
+	 */
+    private void sendTouchedState() {
+        try {
+                communicator.send(new Message(MessageType.CRASH, null));
+        } catch (IOException e) {
+                System.out.println("Exception thrown.");
+        }
+    }
+	
+	/**
 	 * Send the wall location back to PC
 	 */
     private void sendWall(int obstacleDistance, int angle) {
@@ -121,7 +153,7 @@ public class Controller implements CommListener {
         try {
                 communicator.send(new Message(MessageType.WALL, sendBackPoint));
         } catch (IOException e) {
-                System.out.println("Exception at WALL - SENDOBSTACLE");
+                System.out.println("Exception at SENDWALL");
         }
     }	
 	
