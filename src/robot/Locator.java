@@ -18,6 +18,7 @@ public class Locator
 	public float echoDistance;
 	public float[] _beaconBearing = new float[2];
 	private Scanner _scanner;
+	//public VariancePose _pose = new VariancePose();
 	
 	// use to shift
 	private float _differenceXFactor = 5.5f;
@@ -70,6 +71,7 @@ public class Locator
 		}
 
 		//After getting the location based on calculation, we will fixPosition
+		// calculateOptimal(fixPosition(bearings, (float) distanceToWall));
 		fixPosition(angleToBeacons, (float) maxEchoDistance);
 		
 		// I'm not happy, so I try to shift it and set the heading
@@ -175,6 +177,29 @@ public class Locator
 
 		return _pose;
 	}
+	
+/*
+     public Pose calculateOptimal (Pose p) {
+            // variances from milestone 3 scan
+            float myVarX = 0.3f;
+            float myVarY = 0.7f;
+            float myVarH = 0.6f;
+            
+            float varX = _pose.getVarX();
+            float varY = _pose.getVarY();
+            float varH = _pose.getVarH();
+            
+            float xL = p.getX();
+            float yL = p.getY();
+            float hL = p.getHeading();
+            
+            float optH = (varH * hL + myVarH * _pose.getHeading()) / (varH + myVarH);
+            float optX = (varX * xL + myVarX * _pose.getX()) / (varX + myVarX);
+            float optY = (varY * yL + myVarY * _pose.getY()) / (varY + myVarY);
+            
+            return new Pose(optX, optY, optH);
+    }
+ */
 
 	/**
 	 *returns angle between -180 and 180 degrees

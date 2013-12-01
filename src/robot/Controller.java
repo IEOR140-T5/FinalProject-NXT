@@ -1,8 +1,11 @@
 package robot;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import robot.TouchDetector;
 import robot.Message;
 import robot.MessageType;
 import lejos.geom.Point;
@@ -26,7 +29,13 @@ public class Controller implements CommListener {
 	private ArrayList<Message> queue;
 	private Locator locator;
 	private int _obstacleDistance = 245;
+	private TouchDetector detector;
 
+	/**
+	 * Constructor that takes in Navigator and Locator
+	 * @param nav
+	 * @param loc
+	 */
 	public Controller(Navigator nav, Locator loc) {
 		System.out.println("Connecting...");
 		communicator = new Communicator();
@@ -34,7 +43,22 @@ public class Controller implements CommListener {
 		navigator = nav; 
 		locator = loc;
 		queue = new ArrayList<Message>();
-		//navigator.addWaypoint(0, 0);
+	}
+	
+	/**
+	 * Constructor that takes in Navigator and Locator and TouchDetector
+	 * @param nav
+	 * @param loc
+	 * @param td
+	 */
+	public Controller(Navigator nav, Locator loc, TouchDetector td) {
+		System.out.println("Connecting...");
+		communicator = new Communicator();
+		communicator.setController(this);
+		navigator = nav; 
+		locator = loc;
+		detector = td;
+		queue = new ArrayList<Message>();
 	}
 
 	/**
@@ -155,7 +179,97 @@ public class Controller implements CommListener {
     	}
     	
     }
-
+    /**
+     * Receive the DataIn and DataOut then decode the message to send it to execute it 
+     * When this method is call, the first value will be the type of message, then the next following
+     * values would be the data for the task.
+     * @param dataIn: data in stream
+     * @param dataOut: data out stream
+     */
+    public void decodeData(DataInputStream dataIn, DataOutputStream dataOut){
+    	try {
+			int headerNumber = dataIn.readInt();
+			MessageType header = MessageType.values()[headerNumber];
+			System.out.println(header.toString());
+			Sound.playNote(Sound.PIANO, 600, 15);
+			switch (header) {
+			case MOVE:
+				float[] move = new float[3];
+				for (int i = 0; i < 2; i++) {
+					move[i] = dataIn.readFloat();
+				}
+				System.out.println("Move " + move[0] + "," + move[1]);
+				updateMessage(new Message(header, move));
+				break;
+			case FIX_POS:
+				System.out.println("Fix pose");
+				updateMessage(new Message(header, null));
+				break;
+			case STOP:
+				System.out.println("Stop");
+				updateMessage(new Message(header, null));
+				break;
+			case ROTATE:
+				float[] rotate = new float[1];
+				rotate[0] = dataIn.readFloat();
+				System.out.println("Rotate " + rotate[0]);
+				updateMessage(new Message(header, rotate));
+				break;
+			case ROTATE_TO:
+				float[] rotateTo = new float[1];
+				rotateTo[0] = dataIn.readFloat();
+				System.out.println("Rotate to " + rotateTo[0]);
+				updateMessage(new Message(header, rotateTo));						
+				break;
+			case TRAVEL:
+				float[] travel = new float[1];
+				travel[0] = dataIn.readFloat();
+				System.out.println("Travel " + travel[0]);
+				updateMessage(new Message(header, travel));
+				break;
+			case SET_POSE:
+				float[] newPose = new float[3];
+				for (int i = 0; i < 3; i++) {
+					newPose[i] = dataIn.readFloat();
+				}
+				System.out.println("Set pose to " + newPose[0] + "," + newPose[1] + "," + 
+						newPose[2]);
+				updateMessage(new Message(header, newPose));
+				break;
+			case SEND_MAP:
+				float[] whereToStop = new float[3];
+				for (int i = 0; i < 3; i++) {
+					whereToStop[i] = dataIn.readFloat();
+				}
+				System.out.println("Map");
+				System.out.println("Mapping coordinates: " + whereToStop[0] + "," + whereToStop[1] + "," + 
+						whereToStop[2]);
+				updateMessage(new Message(header, whereToStop));
+				break;
+			case ECHO:
+				System.out.println("Echo");
+				float[] echo = new float[1];
+				echo[0] = dataIn.readFloat();
+				updateMessage(new Message(header, echo));
+				break;
+			case EXPLORE:
+				System.out.println("Ping");
+				updateMessage(new Message(header, null));
+				break;
+			case STDDEV:
+				System.out.println("Standard Deviation");
+				updateMessage(new Message(header, null));
+				break;
+			default:
+				System.out.println("Invalid Message");
+				break;
+			}
+		} catch (IOException e){
+			System.out.print("DecodeData error");
+		}
+    }
+    
+    
 	/**
 	 * Parses the given message and acts on it accordingly.
 	 * 
@@ -223,9 +337,15 @@ public class Controller implements CommListener {
 			System.out.println("PINGING");
 			sendPingAll();
 			break;
+		case STDDEV:
+			System.out.println("PINGING");
+			break;
 		default:
 			System.out.println("MESSAGE NOT IN THE LIST");
 			break;
 		}
 	} 
+	
+
+	
 }
