@@ -132,7 +132,7 @@ public class Controller implements CommListener {
 	 */
     private void sendTouchedState() {
         try {
-                communicator.send(new Message(MessageType.CRASH, null));
+                communicator.send(new Message(MessageType.WALLDETECTED, null));
         } catch (IOException e) {
                 System.out.println("Exception thrown.");
         }
