@@ -23,9 +23,9 @@ public class Milestone6 {
 				rightWheelDiameter, trackWidth, Motor.A, Motor.C, false);
 
 		//dp.setAcceleration(300);
-		dp.setAcceleration(100);
-		dp.setTravelSpeed(20);
-		dp.setRotateSpeed(100);
+		dp.setAcceleration(60);
+		dp.setTravelSpeed(30);
+		dp.setRotateSpeed(120);
 		
 		/**
 		 * Declares objects that the robot needs to operate, and go go go

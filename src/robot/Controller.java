@@ -355,10 +355,11 @@ public class Controller implements CommListener {
             //Pose starterPose = navigator.getPoseProvider().getPose();
 			System.out.println("MAPPING");
             locator.getScanner().rotateHeadTo(m.getData()[2]);
-			
+            ((DifferentialPilot) navigator.getMoveController()).setTravelSpeed(30);
 			//locator.getScanner().rotate(m.getData()[2], false);
             navigator.goTo(m.getData()[0], m.getData()[1]);
             sendData(true, true);
+            ((DifferentialPilot) navigator.getMoveController()).setTravelSpeed(70);
 			break;
 		case ECHO:
 			System.out.println("ECHOING");

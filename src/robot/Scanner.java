@@ -18,7 +18,8 @@ public class Scanner {
 		ultraSensor = us;
 		lightSensor.setFloodlight(false);
 		bearings = new int[2];
-		m.setSpeed(70);
+		motor.setSpeed(70);
+		motor.setAcceleration(70);
 	}
 
 
