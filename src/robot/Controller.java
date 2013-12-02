@@ -5,12 +5,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import robot.TouchDetector;
+import robot.TouchsensorDetector;
 import robot.Message;
 import robot.MessageType;
 import lejos.geom.Point;
 import lejos.nxt.Sound;
-import lejos.nxt.TouchSensor;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
 import lejos.robotics.navigation.Pose;
@@ -29,7 +28,7 @@ public class Controller implements CommListener {
 	private ArrayList<Message> queue;
 	private Locator locator;
 	private int _obstacleDistance = 245;
-	private TouchDetector detector;
+	private TouchsensorDetector detector;
 
 	/**
 	 * Constructor that takes in Navigator and Locator
@@ -51,14 +50,14 @@ public class Controller implements CommListener {
 	 * @param loc
 	 * @param td
 	 */
-	public Controller(Navigator nav, Locator loc, TouchDetector td) {
+	public Controller(Navigator nav, Locator loc, TouchsensorDetector td) {
 		System.out.println("Connecting...");
 		communicator = new Communicator();
 		communicator.setController(this);
 		navigator = nav; 
 		locator = loc;
 		detector = td;
-		detector.setTouchDetectorListener(this);
+		detector.setControllerListener(this);
 		queue = new ArrayList<Message>();
 	}
 
@@ -93,7 +92,7 @@ public class Controller implements CommListener {
 	}
 	
     public void touchSensorTouched(boolean isLeftTouched, boolean isRightTouched) {
-    	int distance = 14;
+    	int distance = 18;
     	int angleToWall = 25;
         if (isLeftTouched){
         	sendWall(distance, -angleToWall);
@@ -134,7 +133,7 @@ public class Controller implements CommListener {
         try {
                 communicator.send(new Message(MessageType.WALLDETECTED, null));
         } catch (IOException e) {
-                System.out.println("Exception thrown.");
+                System.out.println("Exception at sendTouchedState");
         }
     }
 	
