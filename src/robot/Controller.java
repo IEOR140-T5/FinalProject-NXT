@@ -58,7 +58,7 @@ public class Controller implements CommListener {
 		navigator = nav; 
 		locator = loc;
 		detector = td;
-		detector.setObstacleListener(this);
+		detector.setTouchDetectorListener(this);
 		queue = new ArrayList<Message>();
 	}
 
@@ -95,7 +95,6 @@ public class Controller implements CommListener {
     public void touchSensorTouched(boolean isLeftTouched, boolean isRightTouched) {
     	int distance = 14;
     	int angleToWall = 25;
-		//obstacleLocation = new PolarPoint((int) Math.round(7 * 2.54), -25);
         if (isLeftTouched){
         	sendWall(distance, -angleToWall);
         } else {

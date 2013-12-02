@@ -8,21 +8,21 @@ import lejos.nxt.TouchSensor;
 
 public class TouchDetector {
 
-	private TouchSensor lb;
-	private TouchSensor rb;
-	private Controller listener;
+	private TouchSensor leftTouchsensor;
+	private TouchSensor rightTouchsensor;
+	private Controller detectorListener;
 	
 
 	public TouchDetector(SensorPort leftTouchSensorPort, SensorPort rightTouchSensorPort) {
-		lb = new TouchSensor(leftTouchSensorPort);
-		rb = new TouchSensor(rightTouchSensorPort);
-		leftTouchSensorPort.addSensorPortListener(new TouchDetectorListener(true));
-		rightTouchSensorPort.addSensorPortListener(new TouchDetectorListener(false));
+		leftTouchsensor = new TouchSensor(leftTouchSensorPort);
+		rightTouchsensor = new TouchSensor(rightTouchSensorPort);
+		leftTouchSensorPort.addSensorPortListener(new TouchDetectorListener(true, false));
+		rightTouchSensorPort.addSensorPortListener(new TouchDetectorListener(false, true));
 	}
 	
 
-	public void setObstacleListener(Controller l) {
-		listener = l;
+	public void setTouchDetectorListener(Controller listener) {
+		detectorListener = listener;
 	}
 	
 	/**
@@ -33,23 +33,22 @@ public class TouchDetector {
 	private class TouchDetectorListener implements SensorPortListener {
 
 		private boolean isLeft;
-		private boolean isRight = false;
+		private boolean isRight;
 
 
-		public TouchDetectorListener(boolean left) {
+		public TouchDetectorListener(boolean left, boolean right) {
 			isLeft = left;
-			isRight = false;
+			isRight = right;
 		}
-
 
 		public void stateChanged(SensorPort port, int aOldValue, int aNewValue) {
 			if ((aNewValue < 190) && (aOldValue > 190)) {
 				System.out.println("Touched! " + aOldValue + " " + aNewValue);
 				Sound.playNote(Sound.PIANO, 500, 50);
 				if (isLeft){
-					listener.touchSensorTouched(true, false);
+					detectorListener.touchSensorTouched(true, false);
 				} else {
-					listener.touchSensorTouched(false, true);
+					detectorListener.touchSensorTouched(false, true);
 				}
 			} else if ((aNewValue > 1000) && (aOldValue > 0)) {
 				System.out.println("Released!" + aOldValue + " " + aNewValue);
