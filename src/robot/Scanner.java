@@ -5,76 +5,87 @@ import lejos.nxt.NXTRegulatedMotor;
 import lejos.nxt.Sound;
 import lejos.nxt.UltrasonicSensor;
 
+/**
+ * Scanner takes care of the Light Value for the bearings and Ultrasonic value, or the Echo Distance to the wall
+ * or objects.
+ * @author Phuoc Nguyen, Khoa Tran
+ *
+ */
 public class Scanner {
 
+	// Instances 
 	private LightSensor lightSensor;
 	private UltrasonicSensor ultraSensor;
 	private NXTRegulatedMotor motor;
-	private int[] bearings;
+	private int[] beaconBearings = new int[2];
+	private int _max = 1000;
+	private int[] sweepingCounterClockwise = {_max, _max};
+	private int[] sweepingClockwise = {_max, _max};
+	private int _THRESHOLD = 35;
+	
 
-	public Scanner(NXTRegulatedMotor m, LightSensor ls, UltrasonicSensor us) {
-		motor = m;
-		lightSensor = ls;
-		ultraSensor = us;
+	/**
+	 * Constructor for Scanner
+	 * @param motor
+	 * @param lightsensor
+	 * @param ultrasonicsensor
+	 */
+	public Scanner(NXTRegulatedMotor inputMotor, LightSensor inputLightSensor, UltrasonicSensor inputUltrasonicSensor) {
+		motor = inputMotor;
+		lightSensor = inputLightSensor;
+		ultraSensor = inputUltrasonicSensor;
 		lightSensor.setFloodlight(false);
-		bearings = new int[2];
 		motor.setSpeed(70);
 		motor.setAcceleration(70);
 	}
 
 
 	/**
-	 * Scans for beacons between a specified start angle and end angle, and then
-	 * backwards again. It looks only at light values above 42, which seems to be
-	 * a good threshold to use, and stores the peaks found in the scanner's bearings
-	 * instance variable.
-	 * 
-	 * @param startAngle angle to start the scan at, in degrees from forward
-	 * @param endAngle   angle to end 1 scan at, in degrees from forward.
+	 * Scan from a given angle to another given angle to get the bearings to 2 beacons
+	 * We will scan twice and get 2 value for each light, the average them
 	 */
 	public void lightScan(int startAngle, int endAngle) {
-		int threshold = 35;
 
 		motor.rotateTo(startAngle);
 
-		int[] ccwBearings = {1000, 1000};
-		int[] cwBearings = {1000, 1000};
-
 		int highestLightValue = 0;
-		int ccwIndex = 0;
-		int cwIndex = 0;
-		boolean ccw = false;
-		boolean ccwAssigned = false;
-		boolean cwAssigned = false;
+		int counterClockwisePosition = 0;
+		int clockwisePosition = 0;
+		boolean isCounterClockwise = false;
+		boolean saveCounterClockwise = false;
+		boolean saveClockwise = false;
+		
+		// flush out the last values
+		resetSweepingArrays();
 
 		int[] startAngles = {startAngle, endAngle};
 		int[] endAngles = {endAngle, startAngle};
 
 		for (int i = 0; i < 2; i++) {
-			ccw = (endAngles[i] > startAngles[i]);
+			isCounterClockwise = (endAngles[i] > startAngles[i]);
 
 			motor.rotateTo(endAngles[i], true);
 
 			while (motor.isMoving()) {
 				int newAngle = motor.getTachoCount();
 
-				int lv = lightSensor.getLightValue();
+				int currentLightValue = lightSensor.getLightValue();
 
-				if ((lv > threshold) && (lv > highestLightValue)) {
-					highestLightValue = lv;
-					if (ccw) {
-						ccwBearings[ccwIndex] = newAngle;
-						ccwAssigned = true;
-					} else if (!ccw) {
-						cwBearings[cwIndex] = newAngle;
-						cwAssigned = true;
+				if ((currentLightValue > _THRESHOLD) && (currentLightValue > highestLightValue)) {
+					highestLightValue = currentLightValue;
+					if (isCounterClockwise) {
+						sweepingCounterClockwise[counterClockwisePosition] = newAngle;
+						saveCounterClockwise = true;
+					} else if (!isCounterClockwise) {
+						sweepingClockwise[clockwisePosition] = newAngle;
+						saveClockwise = true;
 					}
-				} else if ((lv < threshold) && (ccw && ccwAssigned && ccwIndex == 0)) {
-					ccwIndex++;
+				} else if ((currentLightValue < _THRESHOLD) && (isCounterClockwise && saveCounterClockwise && counterClockwisePosition == 0)) {
+					counterClockwisePosition++;
 					highestLightValue = 0;
 					Sound.playNote(Sound.PIANO, 200, 5);
-				} else if ((lv < threshold) && (!ccw && cwAssigned && cwIndex == 0)) {
-					cwIndex++;
+				} else if ((currentLightValue < _THRESHOLD) && (!isCounterClockwise && saveClockwise && clockwisePosition == 0)) {
+					clockwisePosition++;
 					highestLightValue = 0;
 					Sound.playNote(Sound.PIANO, 700, 5);
 				}
@@ -84,145 +95,158 @@ public class Scanner {
 			highestLightValue = 0;
 		}
 
-		calculateBearingsFromLightValues(ccwBearings, cwBearings);
+		calculateBearings();
 	}
-
-
+	
 	/**
-	 * Takes both sets of bearings found from the clockwise scan and the counterclockwise
-	 * scans, then combines them to create a set of true bearings to the beacons.
-	 * 
-	 * @param ccwBearings the bearings gotten from the counterclockwise scan
-	 * @param cwBearings  the bearings gotten from the clockwise scan
+	 * Reset the bearings array everytime we do a scan and calculation
 	 */
-	public void calculateBearingsFromLightValues(int[] ccwBearings, int[] cwBearings) {
-		if (ccwBearings[1] == 1000) {
-
-			if (Math.abs(ccwBearings[0] - cwBearings[0]) <= 15) {
-				ccwBearings[1] = ccwBearings[0];
-				ccwBearings[0] = 1000;
-			}
-
-		} else if (cwBearings[1] == 1000) {
-
-			if (Math.abs(cwBearings[0] - ccwBearings[0]) <= 15) {
-				cwBearings[1] = cwBearings[0];
-				cwBearings[0] = 1000;
-			}
-
+	public void resetSweepingArrays(){
+		for (int i=0; i < 2; i++){
+			sweepingCounterClockwise[i] = _max;
+			sweepingClockwise[i] = _max;
 		}
+	}
 
-		for (int i = 0; i < ccwBearings.length; i++) {
-			if (ccwBearings[i] == 1000) {
-				ccwBearings[i] = cwBearings[1 - i];
-			} else if (cwBearings[i] == 1000) {
-				cwBearings[i] = ccwBearings[1 - i];
+
+	/**
+	 * Calculate the average value for each of the beacon
+	 * @param ccwBearings: counter clockwise bearings
+	 * @param cwBearings: clockwise bearings
+	 */
+	public void calculateBearings() {
+		// Check if the scan missed a beacon
+		filterBearings();
+		for (int i = 0; i < sweepingCounterClockwise.length; i++) {
+			if (sweepingCounterClockwise[i] == _max) {
+				sweepingCounterClockwise[i] = sweepingClockwise[1 - i];
+			} else if (sweepingClockwise[i] == _max) {
+				sweepingClockwise[i] = sweepingCounterClockwise[1 - i];
 			}
 
-			bearings[i] = (ccwBearings[i] + cwBearings[1 - i]) / 2;
+			beaconBearings[i] = (sweepingCounterClockwise[i] + sweepingClockwise[1 - i]) / 2;
 		}
 	}
 
 	/**
-	 * Returns the echo distance to something at a specific angle.
-	 * 
-	 * @param angle the angle the head should go to
-	 * @return the echo distance at that angle
+	 * Check whether the scan process missed a beacon or not
+	 */
+	public void filterBearings(){
+		if (sweepingCounterClockwise[1] == _max) {
+			if (Math.abs(sweepingCounterClockwise[0] - sweepingClockwise[0]) <= 15) {
+				sweepingCounterClockwise[1] = sweepingCounterClockwise[0];
+				sweepingCounterClockwise[0] = _max;
+			}
+
+		} else if (sweepingClockwise[1] == _max) {
+			if (Math.abs(sweepingClockwise[0] - sweepingCounterClockwise[0]) <= 15) {
+				sweepingClockwise[1] = sweepingClockwise[0];
+				sweepingClockwise[0] = _max;
+			}
+
+		}
+	}
+	/**
+	 * Return the distance to a specific angle
+	 * @param angle: angle to return distance
+	 * @return: echo distance
 	 */
 	public int getEchoDistance(float angle) {
-		//Given angle from heading to wall, get the distance to that wall
-
-		while (Math.abs(angle - motor.getTachoCount()) > 180) {
-			if (angle > motor.getTachoCount()) {
-				angle -= 360;
-			} else {
-				angle += 360;
-			}
-		}
-
+		angle = normalize(angle);
 		motor.rotateTo((int) angle);
-
 		return ultraSensor.getDistance();
 	}
 
 	/**
-	 * Returns the echo distance to something at a specific angle.
-	 * 
-	 * @param angle the angle the head should go to
-	 * @return the echo distance at that angle
+	 * return the distance to a specific angle
+	 * @param angle
+	 * @return distance 
 	 */
 	public int getDistance(float angle) {
-		//Given angle from heading to wall, get the distance to that wall
-
-		while (Math.abs(angle - motor.getTachoCount()) > 180) {
-			if (angle > motor.getTachoCount()) {
-				angle -= 360;
-			} else {
-				angle += 360;
-			}
-		}
-
+		angle = normalize(angle);
 		motor.rotateTo((int) angle);
-
 		return ultraSensor.getDistance();
 	}
+	
+	/**
+	 * Normalize the given angle
+	 * @param angle
+	 * @return normalized angle
+	 */
+	public float normalize(float angle){
+		while (Math.abs(angle - motor.getTachoCount()) > 180) {
+			if (angle > motor.getTachoCount()) {
+				return (angle - 360);
+			} else {
+				return (angle + 360);
+			}
+		}
+		return angle;
+	}
+	
 	/** 
-	 * Returns the echo distance at the angle the scanner head is currently facing
-	 * @return the echo distance
+	 * Return the distance to the current heading
+	 * @return : current distance
 	 */
 	public int getEchoDistance() {
 		return ultraSensor.getDistance();
 	}
 
-	/** 
-	 * Returns the echo distance at the angle the scanner head is currently facing
-	 * @return the echo distance
+	/**
+	 * get distance from the current angle that its heading
+	 * @return distance
 	 */
 	public int getDistance() {
 		return ultraSensor.getDistance();
 	}
 
 	/**
-	 * Rotates the scanner head to a specific angle.
-	 * 
-	 * @param angle the angle the head to rotate to
+	 * Rotate the scanner to a specific angle
+	 * @param angle
 	 */
 	public void rotateHeadTo(float angle) {
-		if (Math.abs(angle - motor.getTachoCount()) > 180) {
-			if (angle > motor.getTachoCount()) {
-				angle -= 360;
-			} else {
-				angle += 360;
-			}
-		}
-
+		angle = normalize(angle);
 		motor.rotateTo((int) angle);
 	}
 
 	/**
-	 * 
-	 * @return the angle that the head is currently looking in.
+	 * Get the current heading of the angle
+	 * @return angle
 	 */
 	public int getHeadAngle() {
 		return motor.getTachoCount();
 	}
 
 	/**
-	 * 
-	 * @return the relative bearings to the light beacons stored in scanner
+	 * Get the bearings to 2 beacons
+	 * @return bearing array
 	 */
 	public int[] getBearings() {
-		return bearings;
+		return beaconBearings;
 	}
 	
+	/**
+	 * Rotate to an angle
+	 * @param angle to rotate
+	 * @param what return true/false
+	 */
 	public void rotate(float angle, boolean what){
 		motor.rotate((int) angle, what);
 	}
 
+	/**
+	 * get the motor to set speed
+	 * @return motor
+	 */
 	public NXTRegulatedMotor getMotor(){
 		return motor;
 	}
 	
+	/**
+	 * Rotate to a specific angle
+	 * @param angle
+	 * @param true or false?
+	 */
 	public void rotateTo(int angle, boolean needToReturn){
 		motor.rotateTo(angle, needToReturn);
 	}

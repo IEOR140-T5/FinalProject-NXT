@@ -69,10 +69,10 @@ public class Detector {
 		@Override
 		public void stateChanged(SensorPort port, int aOldValue, int aNewValue) {
 			if (aNewValue > 1000){
-				System.out.println("Released!" + aOldValue + " " + aNewValue);
+				System.out.println("Released!");
 				Sound.playNote(Sound.PIANO, 600, 50);
 			} else {
-				System.out.println("Touched! " + aOldValue + " " + aNewValue);
+				System.out.println("Touched! ");
 				Sound.playNote(Sound.PIANO, 500, 50);
 				if (isLeft){
 					detectorListener.touchSensorTouched(true, false);
