@@ -37,7 +37,7 @@ public class Milestone6 {
 		Scanner scanner = new Scanner(Motor.B, new LightSensor(SensorPort.S2), 
 				new UltrasonicSensor(SensorPort.S3));
 		Locator locator = new Locator(scanner);
-		TouchsensorDetector detector = new TouchsensorDetector(SensorPort.S1, SensorPort.S4);
+		Detector detector = new Detector(SensorPort.S1, SensorPort.S4);
 		
 		Controller controller = new Controller(navigator, locator, detector);
 		controller.go();

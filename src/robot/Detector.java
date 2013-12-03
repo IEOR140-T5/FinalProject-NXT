@@ -12,7 +12,7 @@ import lejos.nxt.TouchSensor;
  * @author Phuoc Nguyen, Khoa Tran
  *
  */
-public class TouchsensorDetector {
+public class Detector {
 
 	// Instances
 	private TouchSensor leftTouchsensor;
@@ -24,7 +24,7 @@ public class TouchsensorDetector {
 	 * @param leftTouchSensorPort - port for left
 	 * @param rightTouchSensorPort - port for right 
 	 */
-	public TouchsensorDetector(SensorPort leftTouchSensorPort, SensorPort rightTouchSensorPort) {
+	public Detector(SensorPort leftTouchSensorPort, SensorPort rightTouchSensorPort) {
 		leftTouchsensor = new TouchSensor(leftTouchSensorPort);
 		rightTouchsensor = new TouchSensor(rightTouchSensorPort);
 		leftTouchSensorPort.addSensorPortListener(new TouchsensorDetectorListener(true, false));
