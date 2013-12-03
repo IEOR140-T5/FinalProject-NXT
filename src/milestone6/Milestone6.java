@@ -15,17 +15,17 @@ public class Milestone6 {
 		/**
 		 * Sets the robot parameters
 		 */
-		float leftWheelDiameter = 5.22f;
-		float rightWheelDiameter = 5.24f;
-		float trackWidth = 13.72f;
+		float leftWheelDiameter = 5.23f;
+		float rightWheelDiameter = 5.22f;
+		float trackWidth = 13.15f;
 
 		DifferentialPilot dp = new DifferentialPilot(leftWheelDiameter,
 				rightWheelDiameter, trackWidth, Motor.A, Motor.C, false);
 
 		//dp.setAcceleration(300);
-		dp.setAcceleration(60);
-		dp.setTravelSpeed(30);
-		dp.setRotateSpeed(120);
+		dp.setAcceleration(40);
+		dp.setTravelSpeed(20);
+		dp.setRotateSpeed(100);
 		
 		/**
 		 * Declares objects that the robot needs to operate, and go go go
