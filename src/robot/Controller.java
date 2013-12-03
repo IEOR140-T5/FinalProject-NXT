@@ -193,12 +193,10 @@ public class Controller implements CommListener {
     /**
      * Ping the surrounding area
      */
-    private void sendPingAll(){
-    	int startAngle = 90;
-    	int endAngle = -90;
-    	locator.getScanner().rotateHeadTo(startAngle);
+    private void sendPingAll(float exploreAngle){
+    	locator.getScanner().rotateHeadTo(exploreAngle);
     	Delay.msDelay(200);
-    	locator.getScanner().rotateTo(endAngle, true);
+    	locator.getScanner().rotateTo((int)-exploreAngle, true);
     	while (locator.getScanner().getMotor().isMoving()){
     		int obstaceDistance;
     		int currentHeadAngle = locator.getScanner().getHeadAngle();
@@ -284,7 +282,9 @@ public class Controller implements CommListener {
 				break;
 			case EXPLORE:
 				System.out.println("Ping");
-				updateMessage(new Message(header, null));
+				float[] exploreAngle = new float[1];
+				exploreAngle[0] = dataIn.readFloat();
+				updateMessage(new Message(header, exploreAngle));
 				break;
 			case STDDEV:
 				System.out.println("Standard Deviation");
@@ -336,6 +336,10 @@ public class Controller implements CommListener {
 			break;
 		case ROTATE_TO:
 			System.out.println("ROTATE TO");
+			Pose currentPose = navigator.getPoseProvider().getPose();
+			float currentHeading = currentPose.getHeading();
+			float desiredHeading = m.getData()[0];
+			navigator.goTo(currentPose.getX(), currentPose.getY(), (desiredHeading - currentHeading));
 			//((DifferentialPilot) navigator.getMoveController()).rotateTo(m.getData()[0]);
 			break;
 		case TRAVEL:
@@ -365,11 +369,11 @@ public class Controller implements CommListener {
 			sendEcho(m.getData()[0]);
 			break;
 		case EXPLORE:
-			System.out.println("PINGING");
-			sendPingAll();
+			System.out.println("EXPLORE");
+			sendPingAll(m.getData()[0]);
 			break;
 		case STDDEV:
-			System.out.println("PINGING");
+			System.out.println("STANDARD DEV");
 			break;
 		default:
 			System.out.println("MESSAGE NOT IN THE LIST");
