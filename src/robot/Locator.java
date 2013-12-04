@@ -14,7 +14,7 @@ public class Locator
 	private float _hallWidth = 241f;
 	private float _beaconToSouthWall = 241f;
 	private Point[] _beaconLocations = {new Point(0,0), new Point(0,_beaconToSouthWall)};
-	public Pose _pose = new Pose();
+	public VariancePose _pose = new VariancePose();
 	public float echoDistance;
 	public float[] _beaconBearing = new float[2];
 	private Scanner _scanner;

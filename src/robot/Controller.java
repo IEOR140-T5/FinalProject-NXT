@@ -11,7 +11,6 @@ import lejos.geom.Point;
 import lejos.nxt.Sound;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
-import lejos.robotics.navigation.Pose;
 import lejos.util.Delay;
 
 /**
@@ -154,10 +153,9 @@ public class Controller implements CommListener {
      * @return
      */
     private float[] wallPoint(int obstacleDistance, int angle) {
+    	VariancePose currPose = (VariancePose) navigator.getPoseProvider().getPose();
     	float[] wallPointArray = new float[2];
-        Point wallPoint =
-        		navigator.getPoseProvider().getPose().pointAt(obstacleDistance, 
-        				angle + navigator.getPoseProvider().getPose().getHeading());
+        Point wallPoint = currPose.pointAt(obstacleDistance, angle + currPose.getHeading());
         wallPointArray[0] = wallPoint.x;
         wallPointArray[1] = wallPoint.y;
 		return wallPointArray;
@@ -186,6 +184,21 @@ public class Controller implements CommListener {
             System.out.println("Exception at SENDWALL");
         }
     }
+    
+    private void sendStdDev() {
+    	VariancePose currPose = (VariancePose) navigator.getPoseProvider().getPose();
+    	float[] stdDevArray = new float[4];
+    	stdDevArray[0] = currPose.getX();
+    	stdDevArray[1] = currPose.getY();
+    	stdDevArray[2] = (float) Math.sqrt(currPose.getVarX());
+    	stdDevArray[3] = (float) Math.sqrt(currPose.getVarY());
+    	try {
+    		communicator.send(new Message(MessageType.STD_DEV, stdDevArray));
+    	}
+    	catch (IOException e) {
+            System.out.println("Exception at SENDWALL");
+        }
+    }
 	
 	/**
 	 * Send Pose back to PC, depending on what type it is.
@@ -196,18 +209,15 @@ public class Controller implements CommListener {
     private void sendData(boolean sendPose, boolean sendWallBoolean) {
         while (navigator.isMoving() || navigator.getMoveController().isMoving()) {
             int obstaceDistance;
-            // headAngle = getTachoCount()
-            int currentHeadAngle = locator.getScanner().getHeadAngle();
-            
-           sendPose();
-            // getEchoDistance = ultrasonic.getDistance()
+            int currentHeadAngle = locator.getScanner().getHeadAngle();          
+            sendPose(); // sends current pose while robot is moving
             obstaceDistance = locator.getScanner().getEchoDistance();
             if (sendWallBoolean && (obstaceDistance < _obstacleDistance)) {
                 sendWall(obstaceDistance, currentHeadAngle);
             }
-        
         }
-        sendPose();    
+        sendPose();
+        sendStdDev();
     }	
     
     /**
@@ -316,10 +326,6 @@ public class Controller implements CommListener {
                 exploreAngle[0] = dataIn.readFloat();
                 updateMessage(new Message(header, exploreAngle));
 				break;
-			case STD_DEV:
-				System.out.println("Standard Deviation");
-				updateMessage(new Message(header, null));
-				break;
 			default:
 				System.out.println("Invalid Message");
 				break;
@@ -349,6 +355,7 @@ public class Controller implements CommListener {
 		case STOP:
 			navigator.stop();
 			sendPose();
+			sendStdDev();
 			break;
 		case GOTO:
 			float[] data = m.getData();
@@ -361,11 +368,13 @@ public class Controller implements CommListener {
 			locator.locateMeAndShiftMe();
 			navigator.getPoseProvider().setPose(locator._pose);
 			sendPose();
+			sendStdDev();
 			break;
 		case ROTATE:
 			System.out.println("ROTATE");
 			((DifferentialPilot) navigator.getMoveController()).rotate(m.getData()[0]);
 			sendPose();
+			sendStdDev();
 			break;
 		case ROTATE_TO:
 			System.out.println("ROTATE TO");
@@ -374,6 +383,7 @@ public class Controller implements CommListener {
              float adjustedHeading = (desiredHeading - currentHeading);
 			((DifferentialPilot) navigator.getMoveController()).rotate(adjustedHeading);
 			sendPose();
+			sendStdDev();
 			break;
 		case TRAVEL:
 			System.out.println("TRAVEL");
@@ -386,6 +396,7 @@ public class Controller implements CommListener {
 			locator._pose.setHeading(m.getData()[2]);
 			navigator.getPoseProvider().setPose(locator._pose);
 			sendPose();
+			sendStdDev();
 			break;
 		case SEND_MAP:
 			System.out.println("MAPPING");
@@ -401,16 +412,10 @@ public class Controller implements CommListener {
 			System.out.println("EXPLORE");
 			sendExplore(m.getData()[0]);
 			break;
-		case STD_DEV:
-			System.out.println("STANDARD DEVIATION");
-			//sendStdDev();
-			break;
 		default:
 			System.out.println("MESSAGE NOT IN THE LIST");
 			break;
 		}
 	} 
-	
-
 	
 }
