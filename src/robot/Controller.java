@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import robot.Detector;
 import robot.Message;
 import robot.MessageType;
 import lejos.geom.Point;
@@ -22,12 +21,14 @@ import lejos.util.Delay;
  * Listener template from professor Glassy
  */
 
+
 public class Controller implements CommListener {
+	
 	private Navigator navigator;
 	private Communicator communicator;
 	private ArrayList<Message> queue;
 	private Locator locator;
-	private int _obstacleDistance = 245;
+	private int _obstacleDistance = 240;
 	private Detector detector;
 
 	/**
@@ -45,7 +46,7 @@ public class Controller implements CommListener {
 	}
 	
 	/**
-	 * Constructor that takes in Navigator and Locator and TouchDetector
+	 * Constructor that takes in Navigator and Locator and Detector
 	 * @param nav
 	 * @param loc
 	 * @param td
@@ -68,11 +69,12 @@ public class Controller implements CommListener {
 	 * @param message: message
 	 */
 	public void updateMessage(Message message) {
-		if(message.getType() == MessageType.STOP) {
+		if (message.getType() == MessageType.STOP) {
 			queue.clear();
 			navigator.stop();
 			navigator.clearPath();
-		} else {
+		}
+		else {
 			queue.add(message);
 		}
 	}
@@ -82,44 +84,49 @@ public class Controller implements CommListener {
 	 */
 	public void go() {
 		Message currentMessage = new Message(MessageType.STOP, new float[1]);
-		while(true) {
-			//System.out.println(currentMessage.getType());
-			while(!queue.isEmpty()) {
+		while (true) {
+			while (!queue.isEmpty()) {
 				currentMessage = queue.remove(0);
 				execute(currentMessage);
 			}
 		}
 	}
 	
-    public void touchSensorTouched(boolean isLeftTouched, boolean isRightTouched) {
-    	int distance = 18;
-    	int angleToWall = 25;
-        if (isLeftTouched){
-        	sendWall(distance, -angleToWall);
-        } else {
-        	sendWall(distance, angleToWall);
-        	
+    public void touchSensorPressed(boolean isLeftTouched, boolean isRightTouched) {
+    	int distance = 10;
+    	int angleToWall = 20;
+        if (isLeftTouched) {
+        	sendCrash(distance, -angleToWall);
         }
-        sendTouchedState();
+        else {
+        	sendCrash(distance, angleToWall);
+        }
         navigator.stop();
-        //navigator.getMoveController().stop();
         navigator.clearPath();
-        //navigator.getMoveController().travel(-5);
         sendPose();
+    }
+    
+    /**
+     * Returns a poseArray of the current pose's x, y, and heading.
+     * @return
+     */
+    private float[] poseArray() {
+    	VariancePose currPose = (VariancePose) navigator.getPoseProvider().getPose();
+    	float[] poseArray = new float[3];
+		poseArray[0] = currPose.getX();
+		poseArray[1] = currPose.getY();
+		poseArray[2] = currPose.getHeading();
+		return poseArray;
     }
 	
 	/**
 	 * Send the pose back to the PC to update
 	 */
 	private void sendPose() {
-		Pose pose = navigator.getPoseProvider().getPose();
-		float[] array = new float[3];
-		array[0] = pose.getX();
-		array[1] = pose.getY();
-		array[2] = pose.getHeading();
 		try {
-			communicator.send(new Message(MessageType.POS_UPDATE, array));
-		} catch (IOException e) {
+			communicator.send(new Message(MessageType.POS_UPDATE, poseArray()));
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -129,51 +136,73 @@ public class Controller implements CommListener {
 	 * either prints out the message to let the user knows
 	 * or do something else
 	 */
-    private void sendTouchedState() {
+    private void sendCrash(int distance, int angleToWall) {
         try {
-                communicator.send(new Message(MessageType.WALLDETECTED, null));
-        } catch (IOException e) {
-                System.out.println("Exception at sendTouchedState");
+        	communicator.send(new Message(MessageType.CRASH, wallPoint(distance, angleToWall)));
+        }
+        catch (IOException e) {
+            System.out.println("Exception thrown.");
         }
     }
 	
+    /**
+     * Returns a wallPointArray of wallPoints x, y, respectively, that are sent to the GUI to map
+     * the walls and bomb. 
+     * Is used by sendCrash(), sendWall(), and sendExplore().
+     * @param obstacleDistance
+     * @param angle
+     * @return
+     */
+    private float[] wallPoint(int obstacleDistance, int angle) {
+    	float[] wallPointArray = new float[2];
+        Point wallPoint =
+        		navigator.getPoseProvider().getPose().pointAt(obstacleDistance, 
+        				angle + navigator.getPoseProvider().getPose().getHeading());
+        wallPointArray[0] = wallPoint.x;
+        wallPointArray[1] = wallPoint.y;
+		return wallPointArray;
+    }
+    
 	/**
 	 * Send the wall location back to PC
 	 */
     private void sendWall(int obstacleDistance, int angle) {
-        float[] sendBackPoint = new float[2];
-        Pose pose = navigator.getPoseProvider().getPose();
-        Point whereWeAre = pose.pointAt(obstacleDistance, angle + pose.getHeading());
-
-        sendBackPoint[0] = whereWeAre.x;
-        sendBackPoint[1] = whereWeAre.y;
-
         try {
-                communicator.send(new Message(MessageType.WALL, sendBackPoint));
-        } catch (IOException e) {
-                System.out.println("Exception at SENDWALL");
+        	communicator.send(new Message(MessageType.WALL, wallPoint(obstacleDistance, angle)));
+        } 
+        catch (IOException e) {
+            System.out.println("Exception at SENDWALL");
         }
-    }	
-	
+    }
+    
+    /**
+	 * 
+	 */
+    private void sendExplore(int obstacleDistance, int angle) {
+        try {
+        	communicator.send(new Message(MessageType.EXPLORE_RECEIVED, wallPoint(obstacleDistance, angle)));
+        } 
+        catch (IOException e) {
+            System.out.println("Exception at SENDWALL");
+        }
+    }
 	
 	/**
 	 * Send Pose back to PC, depending on what type it is.
 	 * This method is used for both sending pose back or sending pose and wall location back
-	 * 
 	 * @param sendPose: send Pose true/false
 	 * @param sendWall: send wall location if set true
-	 * 
 	 */
-    private void sendData(boolean sendPose, boolean sendWall) {
+    private void sendData(boolean sendPose, boolean sendWallBoolean) {
         while (navigator.isMoving() || navigator.getMoveController().isMoving()) {
             int obstaceDistance;
             // headAngle = getTachoCount()
             int currentHeadAngle = locator.getScanner().getHeadAngle();
             
-            sendPose();
+           sendPose();
             // getEchoDistance = ultrasonic.getDistance()
             obstaceDistance = locator.getScanner().getEchoDistance();
-            if (sendWall && (obstaceDistance < _obstacleDistance)) {
+            if (sendWallBoolean && (obstaceDistance < _obstacleDistance)) {
                 sendWall(obstaceDistance, currentHeadAngle);
             }
         
@@ -182,31 +211,33 @@ public class Controller implements CommListener {
     }	
     
     /**
-     * Ping the given angle
+     * The robot sends out a ping used to map a single point on the GUI. 
+     * @param angle 
      */
-    private void sendEcho(float angle){
+    private void sendEcho(float angle) {
     	locator.getScanner().rotateHeadTo(angle);
     	int obstacleDistance = locator.getScanner().getEchoDistance(angle);
-    	sendWall(obstacleDistance, (int)angle);
+    	sendWall(obstacleDistance, (int) angle);
     }
     
     /**
-     * Ping the surrounding area
+     * Sends a ping to the surrounding area by a given exploreAngle from the user.
      */
-    private void sendPingAll(float exploreAngle){
+    private void sendExplore(float exploreAngle) {
     	locator.getScanner().rotateHeadTo(exploreAngle);
-    	Delay.msDelay(200);
-    	locator.getScanner().rotateTo((int)-exploreAngle, true);
-    	while (locator.getScanner().getMotor().isMoving()){
+        Delay.msDelay(200);
+        locator.getScanner().rotateTo((int)-exploreAngle, true);
+    	while (locator.getScanner().getMotor().isMoving()) {
     		int obstaceDistance;
     		int currentHeadAngle = locator.getScanner().getHeadAngle();
             obstaceDistance = locator.getScanner().getEchoDistance();
+            
             if (obstaceDistance < _obstacleDistance) {
-                sendWall(obstaceDistance, currentHeadAngle);
+                sendExplore(obstaceDistance, currentHeadAngle);
             }
-    	}
-    	
+    	}	
     }
+    
     /**
      * Receive the DataIn and DataOut then decode the message to send it to execute it 
      * When this method is call, the first value will be the type of message, then the next following
@@ -214,14 +245,14 @@ public class Controller implements CommListener {
      * @param dataIn: data in stream
      * @param dataOut: data out stream
      */
-    public void decodeData(DataInputStream dataIn, DataOutputStream dataOut){
+    public void decodeData(DataInputStream dataIn, DataOutputStream dataOut) {
     	try {
 			int headerNumber = dataIn.readInt();
 			MessageType header = MessageType.values()[headerNumber];
 			System.out.println(header.toString());
 			Sound.playNote(Sound.PIANO, 600, 15);
 			switch (header) {
-			case MOVE:
+			case GOTO:
 				float[] move = new float[3];
 				for (int i = 0; i < 2; i++) {
 					move[i] = dataIn.readFloat();
@@ -269,9 +300,8 @@ public class Controller implements CommListener {
 				for (int i = 0; i < 3; i++) {
 					whereToStop[i] = dataIn.readFloat();
 				}
-				System.out.println("Map");
-				System.out.println("Mapping coordinates: " + whereToStop[0] + "," + whereToStop[1] + "," + 
-						whereToStop[2]);
+				System.out.println("Mapping coordinates: " + whereToStop[0] + 
+						"," + whereToStop[1] + "," + whereToStop[2]);
 				updateMessage(new Message(header, whereToStop));
 				break;
 			case ECHO:
@@ -281,12 +311,12 @@ public class Controller implements CommListener {
 				updateMessage(new Message(header, echo));
 				break;
 			case EXPLORE:
-				System.out.println("Ping");
+				System.out.println("Explore");
 				float[] exploreAngle = new float[1];
-				exploreAngle[0] = dataIn.readFloat();
-				updateMessage(new Message(header, exploreAngle));
+                exploreAngle[0] = dataIn.readFloat();
+                updateMessage(new Message(header, exploreAngle));
 				break;
-			case STDDEV:
+			case STD_DEV:
 				System.out.println("Standard Deviation");
 				updateMessage(new Message(header, null));
 				break;
@@ -294,20 +324,23 @@ public class Controller implements CommListener {
 				System.out.println("Invalid Message");
 				break;
 			}
-		} catch (IOException e){
+		} 
+    	catch (IOException e){
 			System.out.print("DecodeData error");
+			try {
+				communicator.exit();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
     }
     
-    
 	/**
 	 * Parses the given message and acts on it accordingly.
-	 * 
 	 * STOP: stop the robot
 	 * MOVE: calls the navigator to move to a given x,y
 	 * FIX_POSE: fixes the position based on the bearings and echo distance
 	 * SET_POSE: updates the locator's and navigator's pose to a given pose
-	 * 
 	 * @param m - the message that represents which action to be executed
 	 */
 	private void execute(Message m) {
@@ -317,7 +350,7 @@ public class Controller implements CommListener {
 			navigator.stop();
 			sendPose();
 			break;
-		case MOVE:
+		case GOTO:
 			float[] data = m.getData();
 			navigator.goTo(data[0], data[1]);
 			sendData(true, false);
@@ -336,11 +369,11 @@ public class Controller implements CommListener {
 			break;
 		case ROTATE_TO:
 			System.out.println("ROTATE TO");
-			Pose currentPose = navigator.getPoseProvider().getPose();
-			float currentHeading = currentPose.getHeading();
-			float desiredHeading = m.getData()[0];
-			navigator.goTo(currentPose.getX(), currentPose.getY(), (desiredHeading - currentHeading));
-			//((DifferentialPilot) navigator.getMoveController()).rotateTo(m.getData()[0]);
+             float currentHeading = navigator.getPoseProvider().getPose().getHeading();
+             float desiredHeading = m.getData()[0];
+             float adjustedHeading = (desiredHeading - currentHeading);
+			((DifferentialPilot) navigator.getMoveController()).rotate(adjustedHeading);
+			sendPose();
 			break;
 		case TRAVEL:
 			System.out.println("TRAVEL");
@@ -355,14 +388,10 @@ public class Controller implements CommListener {
 			sendPose();
 			break;
 		case SEND_MAP:
-            //Pose starterPose = navigator.getPoseProvider().getPose();
 			System.out.println("MAPPING");
             locator.getScanner().rotateHeadTo(m.getData()[2]);
-            ((DifferentialPilot) navigator.getMoveController()).setTravelSpeed(30);
-			//locator.getScanner().rotate(m.getData()[2], false);
             navigator.goTo(m.getData()[0], m.getData()[1]);
             sendData(true, true);
-            ((DifferentialPilot) navigator.getMoveController()).setTravelSpeed(70);
 			break;
 		case ECHO:
 			System.out.println("ECHOING");
@@ -370,10 +399,11 @@ public class Controller implements CommListener {
 			break;
 		case EXPLORE:
 			System.out.println("EXPLORE");
-			sendPingAll(m.getData()[0]);
+			sendExplore(m.getData()[0]);
 			break;
-		case STDDEV:
-			System.out.println("STANDARD DEV");
+		case STD_DEV:
+			System.out.println("STANDARD DEVIATION");
+			//sendStdDev();
 			break;
 		default:
 			System.out.println("MESSAGE NOT IN THE LIST");
