@@ -187,11 +187,13 @@ public class Controller implements CommListener {
     
     private void sendStdDev() {
     	VariancePose currPose = (VariancePose) navigator.getPoseProvider().getPose();
-    	float[] stdDevArray = new float[4];
+    	float[] stdDevArray = new float[6];
     	stdDevArray[0] = currPose.getX();
     	stdDevArray[1] = currPose.getY();
-    	stdDevArray[2] = (float) Math.sqrt(currPose.getVarX());
-    	stdDevArray[3] = (float) Math.sqrt(currPose.getVarY());
+    	stdDevArray[2] = currPose.getHeading();
+    	stdDevArray[3] = (float) Math.sqrt(currPose.getVarX());
+    	stdDevArray[4] = (float) Math.sqrt(currPose.getVarY());
+    	stdDevArray[5] = (float) Math.sqrt(currPose.getVarH());
     	try {
     		communicator.send(new Message(MessageType.STD_DEV, stdDevArray));
     	}

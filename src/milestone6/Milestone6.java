@@ -31,7 +31,6 @@ public class Milestone6 {
 		 */
         VariancePoseProvider variance = new VariancePoseProvider(diffPilot, 0.25f, 4f);
         Navigator navigator = new Navigator(diffPilot, variance);
-		//Navigator navigator = new Navigator(dp);
 		
 		Scanner scanner = new Scanner(Motor.B, new LightSensor(SensorPort.S2), 
 				new UltrasonicSensor(SensorPort.S3));
