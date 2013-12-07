@@ -197,7 +197,65 @@ public class Scanner {
 
 		motor.rotateTo((int) angle);
 	}
+	
+	/**
+	 * Locate the bomb based on a given limit angle
+	 * @param startAngle
+	 * @param endAngle
+	 * @return
+	 */
 
+	public float[] locateTheBomb(int startAngle, int endAngle){
+		int _max = 1000;
+        int smallestDistance = _max;
+        float result[] = new float[2];
+
+        motor.rotateTo(startAngle);
+
+        int[] ccwBearings = {_max, _max};
+        int[] cwBearings = {_max, _max};
+
+        int[] startAngles = {startAngle, endAngle};
+        int[] endAngles = {endAngle, startAngle};
+
+        boolean isCounterClockwise = false;
+
+        for (int i = 0; i < 2; i++) {
+                smallestDistance = _max;
+
+                isCounterClockwise = (endAngles[i] > startAngles[i]);
+
+                motor.rotateTo(endAngles[i], true);
+
+                while (motor.isMoving()) {
+                        int currentAngle = motor.getTachoCount();
+                        int distanceToBomb = ultraSensor.getDistance();
+
+                        if (distanceToBomb < smallestDistance) {
+                                smallestDistance = distanceToBomb;
+                                if (isCounterClockwise) {
+                                        ccwBearings[0] = currentAngle;
+                                } else {
+                                        cwBearings[0] = currentAngle;
+                                }
+                        } else if (distanceToBomb == smallestDistance) {
+                                if (isCounterClockwise) {
+                                        ccwBearings[1] = currentAngle;
+                                } else {
+                                        cwBearings[1] = currentAngle;
+                                }
+                        }
+
+                }
+
+        }
+
+        result[0] = (sweepingCounterClockwise[0] + sweepingCounterClockwise[1] + 
+				sweepingClockwise[0] + sweepingClockwise[1]) / 4;
+        result[1] = smallestDistance;
+        
+        return result;
+	}
 	/**
 	 * 
 	 * @return the angle that the head is currently looking in.

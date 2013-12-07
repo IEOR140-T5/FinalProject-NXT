@@ -270,6 +270,7 @@ public class Controller implements CommListener {
     }
     
     /**
+<<<<<<< HEAD
      * Disconnects the robot form the PC.
      */
     private void sendDisconnect() {
@@ -291,24 +292,69 @@ public class Controller implements CommListener {
         float [] result;        // result[0] = angle, result[1] = distance;
             
         //Scan when the bomb is in the front
+=======
+     * Find an angle that the bomb is located and turn the back to that direction
+     * Then do another scan to make sure it's a right angle
+     * Then reverse and grab the bomb
+     * Pose will be updated continously during the process
+     */
+    private void grabTheBomb(){
+    	int limitAngle = 30;	// Range to scan, the smaller the better or it will detect the wall
+    	float [] result;   		// result[0] = angle, result[1] = distance;
+    	
+    	//Scan when the bomb is in the front
+>>>>>>> ce24f1eadac6155dd4fba8e54293db49e4e5d58c
         result = scanForward(limitAngle);
         // Rotate backward to the bomb
         rotateToTheBomb(result[0] + 180);
         // update the location
         sendPose();
+<<<<<<< HEAD
     
         navigator.getMoveController().travel(-result[1]);
+=======
+        // Scan when the bomb is in the back
+        result = scanBackward(limitAngle);
+        // Rotate to the bomb
+        rotateToTheBomb(result[0] - 180);
+        // update the location
+        sendPose();
+        
+        float distanceToBomb = result[1];
+        float minValueToScan = 60;
+        int smallDistanceToTravel = 10;
+        boolean needToScan = distanceToBomb > minValueToScan;
+        while (needToScan) {
+                navigator.getMoveController().travel(-smallDistanceToTravel);
+                sendPose();
+                // Scan when the bomb is in the back
+                result = scanBackward(limitAngle);
+                // Rotate to the bomb
+                rotateToTheBomb(result[0] - 180);
+                // Does the robot need to scan again
+                needToScan = result[1] > minValueToScan;
+        }
+        // Need to work on this, i just estimate the remaining distance
+        navigator.getMoveController().travel(-result[1] + smallDistanceToTravel);
+>>>>>>> ce24f1eadac6155dd4fba8e54293db49e4e5d58c
         sendPose();
     }
     
     /**
+<<<<<<< HEAD
      * Scan for the bomb when the robot is facing it.
      */
     private float[] scanForward(int limitAngle) {
+=======
+     * Scan for the bomb when the robot is facing it
+     */
+    private float[] scanForward(int limitAngle){
+>>>>>>> ce24f1eadac6155dd4fba8e54293db49e4e5d58c
     	return locator.getScanner().locateTheBomb(-limitAngle, limitAngle);
     }
     
     /**
+<<<<<<< HEAD
      * Scan for the bomb is at the back of the robot.
      */
     private float[] scanBackward(int limitAngle) {
@@ -320,6 +366,15 @@ public class Controller implements CommListener {
      * @param angle
      */
     private void rotateToTheBomb(float angle) {
+=======
+     * Scan for the bomb is at the back of the robot
+     */
+    private float[] scanBackward(int limitAngle){
+    	return locator.getScanner().locateTheBomb(180 - limitAngle, 180 + limitAngle);
+    }
+    
+    private void rotateToTheBomb(float angle){
+>>>>>>> ce24f1eadac6155dd4fba8e54293db49e4e5d58c
     	((DifferentialPilot) navigator.getMoveController()).rotate(normalize(angle));
     }
     
@@ -328,17 +383,27 @@ public class Controller implements CommListener {
      * @param angle
      * @return
      */
+<<<<<<< HEAD
     private float normalize(float angle) {
 	    float normalized = angle;
 	    while (normalized > 180) {
 	    	normalized -= 360;
+=======
+    private float normalize(float angle){
+    	float normalized = angle;
+	       while (normalized > 180) {
+	    	   normalized -= 360;
+>>>>>>> ce24f1eadac6155dd4fba8e54293db49e4e5d58c
 	    }
 	    while (normalized < -180) {
 	    	normalized += 360;
 	    }
 	    return normalized;
     }
+<<<<<<< HEAD
     
+=======
+>>>>>>> ce24f1eadac6155dd4fba8e54293db49e4e5d58c
     /**
      * Receive the DataIn and DataOut then decode the message to send it to execute it 
      * When this method is call, the first value will be the type of message, then the next following
@@ -418,12 +483,18 @@ public class Controller implements CommListener {
                 updateMessage(new Message(header, exploreAngle));
 				break;
 			case GRAB_BOMB:
+<<<<<<< HEAD
                 System.out.println("Grab Bomb");
                 updateMessage(new Message(header, null));
                 break; 
 			case DISCONNECT:
 				System.out.println("Update message disconnect");
 				updateMessage(new Message(header, null));
+=======
+				System.out.println("Grab Bomb");
+				updateMessage(new Message(header, null));
+				break;				
+>>>>>>> ce24f1eadac6155dd4fba8e54293db49e4e5d58c
 			default:
 				System.out.println("Invalid Message");
 				break;
@@ -511,12 +582,17 @@ public class Controller implements CommListener {
 			sendExplore(m.getData()[0]);
 			break;
 		case GRAB_BOMB:
+<<<<<<< HEAD
             System.out.println("GRAB BOMB");
             grabTheBomb();
             break;
 		case DISCONNECT:
 			System.out.println("DISCONNECT");
 			sendDisconnect();
+=======
+			System.out.println("GRAB BOMB");
+			grabTheBomb();
+>>>>>>> ce24f1eadac6155dd4fba8e54293db49e4e5d58c
 			break;
 		default:
 			System.out.println("MESSAGE NOT IN THE LIST");
