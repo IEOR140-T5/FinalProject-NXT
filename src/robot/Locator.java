@@ -18,7 +18,6 @@ public class Locator
 	public float echoDistance;
 	public float[] _beaconBearing = new float[2];
 	private Scanner _scanner;
-	//public VariancePose _pose = new VariancePose();
 	
 	// use to shift
 	private float _differenceXFactor = 5.5f;

@@ -1,6 +1,7 @@
 package robot;
 
 import java.io.DataInputStream;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -91,6 +92,12 @@ public class Controller implements CommListener {
 		}
 	}
 	
+	/**
+	 * If a touch sensor on the bumper is pressed then stop the robot and send the
+	 * crash and the pose to the PC.
+	 * @param isLeftTouched
+	 * @param isRightTouched
+	 */
     public void touchSensorPressed(boolean isLeftTouched, boolean isRightTouched) {
     	int distance = 10;
     	int angleToWall = 20;
@@ -150,7 +157,7 @@ public class Controller implements CommListener {
      * Is used by sendCrash(), sendWall(), and sendExplore().
      * @param obstacleDistance
      * @param angle
-     * @return
+     * @return a wallPoint array of wall coordinates scanned.
      */
     private float[] wallPoint(int obstacleDistance, int angle) {
     	VariancePose currPose = (VariancePose) navigator.getPoseProvider().getPose();
@@ -162,29 +169,33 @@ public class Controller implements CommListener {
     }
     
 	/**
-	 * Send the wall location back to PC
+	 * Sends the wall location back to PC to map onto the GUI.
 	 */
     private void sendWall(int obstacleDistance, int angle) {
         try {
         	communicator.send(new Message(MessageType.WALL, wallPoint(obstacleDistance, angle)));
-        } 
+        }
         catch (IOException e) {
             System.out.println("Exception at SENDWALL");
         }
     }
     
     /**
-	 * 
+	 * Sends the wall coordinates the robot scanned back to the PC to
+	 * map onto the GUI.
 	 */
     private void sendExplore(int obstacleDistance, int angle) {
         try {
         	communicator.send(new Message(MessageType.EXPLORE_RECEIVED, wallPoint(obstacleDistance, angle)));
-        } 
+        }
         catch (IOException e) {
             System.out.println("Exception at SENDWALL");
         }
     }
     
+    /**
+     * Sends the current pose and standard deviation to the PC.
+     */
     private void sendStdDev() {
     	VariancePose currPose = (VariancePose) navigator.getPoseProvider().getPose();
     	float[] stdDevArray = new float[6];
@@ -218,9 +229,9 @@ public class Controller implements CommListener {
                 sendWall(obstaceDistance, currentHeadAngle);
             }
         }
-        sendPose();
         sendStdDev();
-    }	
+        sendPose();
+    }
     
     /**
      * The robot sends out a ping used to map a single point on the GUI. 
@@ -229,11 +240,19 @@ public class Controller implements CommListener {
     private void sendEcho(float angle) {
     	locator.getScanner().rotateHeadTo(angle);
     	int obstacleDistance = locator.getScanner().getEchoDistance(angle);
-    	sendWall(obstacleDistance, (int) angle);
+    	 try {
+         	communicator.send(new Message(MessageType.ECHO, wallPoint(obstacleDistance, (int) angle)));
+         }
+         catch (IOException e) {
+             System.out.println("Exception at SEND ECHO");
+         }
     }
     
     /**
      * Sends a ping to the surrounding area by a given exploreAngle from the user.
+     * This is used to map walls and the bomb when using map left or map right or
+     * sending a single ping is not sufficient enough to determine the surroundings 
+     * of the robot.
      */
     private void sendExplore(float exploreAngle) {
     	locator.getScanner().rotateHeadTo(exploreAngle);
@@ -248,6 +267,76 @@ public class Controller implements CommListener {
                 sendExplore(obstaceDistance, currentHeadAngle);
             }
     	}	
+    }
+    
+    /**
+     * Disconnects the robot form the PC.
+     */
+    private void sendDisconnect() {
+    	try {
+			communicator.exit();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    /**
+     * Find an angle that the bomb is located and turn the back to that direction
+     * Then do another scan to make sure it's a right angle
+     * Then reverse and grab the bomb
+     * Pose will be updated continuously during the process
+     */
+    private void grabTheBomb() {
+    	int limitAngle = 40;	// Range to scan, the smaller the better or it will detect the wall
+        float [] result;        // result[0] = angle, result[1] = distance;
+            
+        //Scan when the bomb is in the front
+        result = scanForward(limitAngle);
+        // Rotate backward to the bomb
+        rotateToTheBomb(result[0] + 180);
+        // update the location
+        sendPose();
+    
+        navigator.getMoveController().travel(-result[1]);
+        sendPose();
+    }
+    
+    /**
+     * Scan for the bomb when the robot is facing it.
+     */
+    private float[] scanForward(int limitAngle) {
+    	return locator.getScanner().locateTheBomb(-limitAngle, limitAngle);
+    }
+    
+    /**
+     * Scan for the bomb is at the back of the robot.
+     */
+    private float[] scanBackward(int limitAngle) {
+    	return locator.getScanner().locateTheBomb(180 - limitAngle, 180 + limitAngle);
+    }
+    
+    /**
+     * Rotate to the bomb after scanning for it.
+     * @param angle
+     */
+    private void rotateToTheBomb(float angle) {
+    	((DifferentialPilot) navigator.getMoveController()).rotate(normalize(angle));
+    }
+    
+    /**
+     * Normalize the rotating angle, to prevent it from doing silly rotation
+     * @param angle
+     * @return
+     */
+    private float normalize(float angle) {
+	    float normalized = angle;
+	    while (normalized > 180) {
+	    	normalized -= 360;
+	    }
+	    while (normalized < -180) {
+	    	normalized += 360;
+	    }
+	    return normalized;
     }
     
     /**
@@ -323,17 +412,24 @@ public class Controller implements CommListener {
 				updateMessage(new Message(header, echo));
 				break;
 			case EXPLORE:
-				System.out.println("Explore");
+				System.out.println("Update message explore");
 				float[] exploreAngle = new float[1];
                 exploreAngle[0] = dataIn.readFloat();
                 updateMessage(new Message(header, exploreAngle));
 				break;
+			case GRAB_BOMB:
+                System.out.println("Grab Bomb");
+                updateMessage(new Message(header, null));
+                break; 
+			case DISCONNECT:
+				System.out.println("Update message disconnect");
+				updateMessage(new Message(header, null));
 			default:
 				System.out.println("Invalid Message");
 				break;
 			}
-		} 
-    	catch (IOException e){
+		}
+    	catch (IOException e) {
 			System.out.print("DecodeData error");
 			try {
 				communicator.exit();
@@ -369,14 +465,14 @@ public class Controller implements CommListener {
 			locator.setPose(navigator.getPoseProvider().getPose());
 			locator.locateMeAndShiftMe();
 			navigator.getPoseProvider().setPose(locator._pose);
-			sendPose();
 			sendStdDev();
+			sendPose();
 			break;
 		case ROTATE:
 			System.out.println("ROTATE");
 			((DifferentialPilot) navigator.getMoveController()).rotate(m.getData()[0]);
-			sendPose();
 			sendStdDev();
+			sendPose();
 			break;
 		case ROTATE_TO:
 			System.out.println("ROTATE TO");
@@ -413,6 +509,14 @@ public class Controller implements CommListener {
 		case EXPLORE:
 			System.out.println("EXPLORE");
 			sendExplore(m.getData()[0]);
+			break;
+		case GRAB_BOMB:
+            System.out.println("GRAB BOMB");
+            grabTheBomb();
+            break;
+		case DISCONNECT:
+			System.out.println("DISCONNECT");
+			sendDisconnect();
 			break;
 		default:
 			System.out.println("MESSAGE NOT IN THE LIST");
