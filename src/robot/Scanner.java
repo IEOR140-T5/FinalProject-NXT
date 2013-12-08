@@ -6,8 +6,9 @@ import lejos.nxt.Sound;
 import lejos.nxt.UltrasonicSensor;
 
 /**
- * Scanner takes care of the Light Value for the bearings and Ultrasonic value, or the Echo Distance to the wall
- * or objects.
+ * Scanner will take care all of the scanning part, by either using
+ * LightSensor or UltrasonicSensor. All the value will be used to detect
+ * the obstacle, calculate the position and most of all to find the bomb.
  * @author Phuoc Nguyen, Khoa Tran
  *
  */

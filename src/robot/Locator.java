@@ -5,7 +5,10 @@ import lejos.nxt.Button;
 import lejos.robotics.navigation.Pose;
 
 /**
- * Locator is just a locator :)
+ * Locator is a main class to locate the robot on the actual grid
+ * based on the location of the 2 beacons. More or less, this class
+ * will do a lot of calculation in order to get the robot to the right
+ * position and heading on the map.
  * @author Phuoc Nguyen, Khoa Tran
  **/
 public class Locator
@@ -70,13 +73,15 @@ public class Locator
 		}
 
 		//After getting the location based on calculation, we will fixPosition
-		// calculateOptimal(fixPosition(bearings, (float) distanceToWall));
 		fixPosition(angleToBeacons, (float) maxEchoDistance);
 		
 		// I'm not happy, so I try to shift it and set the heading
 		_pose.setLocation(_pose.pointAt(_differenceXFactor, _pose.getHeading() + 180));
 	}
 
+	/**
+	 * Debugging method to check where we are
+	 */
 	public void printPose() {
 		System.out.println("X: " + _pose.getX());
 		System.out.println("Y: " + _pose.getY());
@@ -177,28 +182,6 @@ public class Locator
 		return _pose;
 	}
 	
-/*
-     public Pose calculateOptimal (Pose p) {
-            // variances from milestone 3 scan
-            float myVarX = 0.3f;
-            float myVarY = 0.7f;
-            float myVarH = 0.6f;
-            
-            float varX = _pose.getVarX();
-            float varY = _pose.getVarY();
-            float varH = _pose.getVarH();
-            
-            float xL = p.getX();
-            float yL = p.getY();
-            float hL = p.getHeading();
-            
-            float optH = (varH * hL + myVarH * _pose.getHeading()) / (varH + myVarH);
-            float optX = (varX * xL + myVarX * _pose.getX()) / (varX + myVarX);
-            float optY = (varY * yL + myVarY * _pose.getY()) / (varY + myVarY);
-            
-            return new Pose(optX, optY, optH);
-    }
- */
 
 	/**
 	 *returns angle between -180 and 180 degrees

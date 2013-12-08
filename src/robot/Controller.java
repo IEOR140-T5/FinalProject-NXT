@@ -298,18 +298,6 @@ public class Controller implements CommListener {
         // update the location
         sendPose();
 
-    
-       // navigator.getMoveController().travel(-result[1]);
-
-        // Scan when the bomb is in the back
-       // result = scanBackward(limitAngle);
-        // Rotate to the bomb
-       // rotateToTheBomb(result[0] - 180);
-        // update the location
-       // sendPose();
-        
-     
-        int smallDistanceToTravel = 10;
         navigator.getMoveController().travel(-result[1]);
         sendPose();
     }
@@ -454,12 +442,8 @@ public class Controller implements CommListener {
     }
     
 	/**
-	 * Parses the given message and acts on it accordingly.
-	 * STOP: stop the robot
-	 * MOVE: calls the navigator to move to a given x,y
-	 * FIX_POSE: fixes the position based on the bearings and echo distance
-	 * SET_POSE: updates the locator's and navigator's pose to a given pose
-	 * @param m - the message that represents which action to be executed
+	 * Take in a message and execute it.
+	 * @param m - the message along with the data to be executed.
 	 */
 	private void execute(Message m) {
 		Sound.playNote(Sound.PIANO, 450, 15);

@@ -1,7 +1,7 @@
 package robot;
 
 /**
- * All of the messages used to communicate between PC and NXT
+ * Main message class used to communicate between PC and NXT
  */
 public class Message {
 
@@ -13,9 +13,9 @@ public class Message {
 	 * @param mt: message type, supposed to be an enum
 	 * @param d: array of data
 	 */
-	public Message(MessageType mt, float[] d) {
-		type = mt;
-		data = d;
+	public Message(MessageType inputMT, float[] inputD) {
+		type = inputMT;
+		data = inputD;
 	}
 	
 	/**

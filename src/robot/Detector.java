@@ -6,7 +6,7 @@ import lejos.nxt.Sound;
 import lejos.nxt.TouchSensor;
 
 /**
- * This class will take care of the Touchsensor and reponse back to the controller
+ * This class will take care of the Touchsensor and response back to the controller
  * whether the Touchsensor is touched. It is better that we know which sensor is touched
  * (left/right) so we can literally map where we hit the object.
  * @author Phuoc Nguyen, Khoa Tran
